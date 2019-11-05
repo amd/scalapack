@@ -1,0 +1,16 @@
+Building Scalapack:
+===================
+
+1. Install the OpenMPI in the machine. Export the 'OpenMPI bin' and 'OpenMPI lib' paths to the 'PATH' and 'LD_LIBRARY_PATH' environment variables respectively.
+   eg. export PATH=/home/amd/openmpi-3.1.1/OpenMpiInstall/bin:$PATH
+   eg. export LD_LIBRARY_PATH=/home/amd/openmpi-3.1.1/OpenMpiInstall/lib:$LD_LIBRARY_PATH
+
+2. Provide the Blis and LibFlame libraries' path in the 'SLmake.inc' file.
+   eg. BLASLIB       = /home/amd/aocl-ubuntu-2.0-1906/amd/aocl/2.0-1906/libs/libblis.a
+   eg. LAPACKLIB     = /home/amd/aocl-ubuntu-2.0-1906/amd/aocl/2.0-1906/libs/libflame.a
+
+3. Run the below commands in the Scalapack folder to build Scalapack Library:
+    make clean
+    make 
+
+
