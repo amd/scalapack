@@ -12,5 +12,7 @@ Building Scalapack:
 3. Run the below commands in the Scalapack folder to build Scalapack Library:
     make clean
     make 
-
-
+    
+4. To Build and Run the Scalapack test suite, Run the below script:
+   ./scalapack_test.sh
+   Build and Test logs will be generated in 'ScalaPack_Build_log.txt' and 'ScalaPack_TestResults.txt' respectively.

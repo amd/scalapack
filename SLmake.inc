@@ -60,9 +60,7 @@ SCALAPACKLIB  = libscalapack.a
 
 # Scalapack needs 'Blis' and 'LibFlame' libraries pre-installed.
 # Please provide Blis and LibFlame library paths (as below)
-
-BLASLIB       = /home/amd/aocl-ubuntu-2.0-1906/amd/aocl/2.0-1906/libs/libblis.a
-LAPACKLIB     = /home/amd/aocl-ubuntu-2.0-1906/amd/aocl/2.0-1906/libs/libflame.a
-
+BLASLIB       = /home/amd/aocl-ubuntu-2.1-1909/amd/aocl/2.1-1909/libs/libblis.a
+LAPACKLIB     = /home/amd/aocl-ubuntu-2.1-1909/amd/aocl/2.1-1909/libs/libflame.a
 
 LIBS          = $(LAPACKLIB) $(BLASLIB)
