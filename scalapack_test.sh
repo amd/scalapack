@@ -5,7 +5,13 @@ make clean  >> ScalaPack_Build_log.txt
 
 make  >> ScalaPack_Build_log.txt
 
-echo "Build completed Successfully"
+if [ -e libscalapack.a ]
+	then
+		echo "Scalapack build successful"
+	else
+		echo "Scalapack build not successful"
+		exit
+fi
 
 echo " "
 echo " Scalapack Testing Started "
