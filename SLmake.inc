@@ -29,7 +29,9 @@ CDEFS         = -DAdd_
 FC            = mpif90
 CC            = mpicc 
 NOOPT         = -O0
-FCFLAGS       = -O3
+FCFLAGS       = -cpp -DLIBFLAME -O3
+# Comment the above line when not linking with LibFlame and Uncomment the below line
+#FCFLAGS       = -O3 
 CCFLAGS       = -O3
 FCLOADER      = $(FC)
 CCLOADER      = $(CC)
