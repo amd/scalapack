@@ -1,0 +1,38 @@
+
+ScaLAPACK For AMD
+===============================================================================
+ScaLAPACK, or Scalable LAPACK, is a library of high performance linear algebra 
+routines for distributed memory computers supporting MPI. 
+
+ScaLAPACK for AMD is the optimized version of ScaLAPACK for AMD EPYC family of 
+processorts. 
+
+
+Building Scalapack for AMD:
+===============================================================================
+
+1. Install MPI library and set the PATH and LD_LIBRARY_PATH environment 
+    variables to point to installed binaries.
+   eg. export PATH=<path to MPI install directory>/bin:$PATH
+   eg. export LD_LIBRARY_PATH=<path to MPI install directory>/lib:$LD_LIBRARY_PATH
+
+2. Download AMD optimized versions of BLIS and libFLAME from following link
+   https://developer.amd.com/amd-aocl/
+
+3. Install BLIS and libFLAME libraries either using pre-built binaries or build 
+   from source.
+   To build BLIS and libFLAME from source, clone from folllowing github links
+   BLIS: https://github.com/amd/blis
+   libFLAME: https://github.com/amd/libflame
+
+3. Provide the Blis and LibFlame libraries' path in the 'SLmake.inc' file.
+   eg. BLASLIB_PATH       = <path to BLIS install directory>
+   eg. LAPACKLIB_PATH     = <path to libFLAME install directory>
+
+3. Run the below commands in the Scalapack folder to build Scalapack Library:
+    make clean
+    make 
+    
+4. To Build and Run the Scalapack test suite, Run the below script:
+   ./scalapack_test.sh
+   Build and Test logs will be generated in 'ScalaPack_Build_log.txt' and 'ScalaPack_TestResults.txt' respectively.

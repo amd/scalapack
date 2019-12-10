@@ -6,11 +6,10 @@
 #
 #  Purpose:         Top-level Definitions
 #
-#  Creation date:   February 15, 2000
+#  Creation date:   November 05, 2019
 #
-#  Modified:        October 13, 2011
+#  Modified:        December 10, 2019
 #
-#  Send bug reports, comments or suggestions to scalapack@cs.utk.edu
 #
 ############################################################################
 #
@@ -60,9 +59,12 @@ SCALAPACKLIB  = libscalapack.a
 #BLASLIB       = -lblas
 #LAPACKLIB     = -llapack
 
-# Scalapack needs 'Blis' and 'LibFlame' libraries pre-installed.
-# Please provide Blis and LibFlame library paths (as below)
-BLASLIB       = /home/amd/aocl-ubuntu-2.1-1909/amd/aocl/2.1-1909/libs/libblis.a
-LAPACKLIB     = /home/amd/aocl-ubuntu-2.1-1909/amd/aocl/2.1-1909/libs/libflame.a
+# AMD optimized Scalapack requires 'Blis' and 'LibFlame' libraries pre-installed.
+# Provide Blis and LibFlame library paths (as below)
+BLASLIB_PATH   :=
+LAPACKLIB_PATH :=
+
+BLASLIB       = $(BLASLIB_PATH)/libblis.a
+LAPACKLIB     = $(LAPACKLIB_PATH)/libflame.a
 
 LIBS          = $(LAPACKLIB) $(BLASLIB)

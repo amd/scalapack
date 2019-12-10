@@ -3,7 +3,7 @@ echo " "
 
 make clean  >> ScalaPack_Build_log.txt
 
-make  >> ScalaPack_Build_log.txt
+make  BLASLIB_PATH=/home/pradeep/amd/aocl/2.0/amd-blis/lib LAPACKLIB_PATH=/home/pradeep/amd/aocl/2.0/amd-libflame/lib >> ScalaPack_Build_log.txt
 
 if [ -e libscalapack.a ]
 	then
