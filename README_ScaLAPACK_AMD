@@ -5,7 +5,7 @@ ScaLAPACK, or Scalable LAPACK, is a library of high performance linear algebra
 routines for distributed memory computers supporting MPI. 
 
 ScaLAPACK for AMD is the optimized version of ScaLAPACK for AMD EPYC family of 
-processorts. 
+processors. 
 
 
 Building Scalapack for AMD:
@@ -21,7 +21,7 @@ Building Scalapack for AMD:
 
 3. Install BLIS and libFLAME libraries either using pre-built binaries or build 
    from source.
-   To build BLIS and libFLAME from source, clone from folllowing github links
+   To build BLIS and libFLAME from source, clone from following github links
    BLIS: https://github.com/amd/blis
    libFLAME: https://github.com/amd/libflame
 
