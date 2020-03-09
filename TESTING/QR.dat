@@ -5,8 +5,8 @@
 6				number of factorizations
 'QR' 'QL' 'LQ' 'RQ' 'QP' 'TZ'	factorizations: QR, QL, LQ, RQ, QP, TZ
 4				number of problems sizes
-2 5 13 15 13 26 30 15		values of M
-2 7 8  10 17 20 30 35		values of N
+42 15 13 26 30 15		values of M. The M value should be more than the MB, NB values.
+42 17 18 30 30 35		values of N. The N value should be more than the MB, NB values.
 4				number of blocking sizes
 4 3 5 5 4 6			values of MB
 4 7 3 5 8 2			values of NB
