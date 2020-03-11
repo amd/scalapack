@@ -265,6 +265,11 @@
       CONTEXT = DESCA( CTXT_ )
       NB = DESCA( NB_ )
 *
+      VL = ONE
+      VU = ONE
+      IL = ONE
+      IU = ONE
+
       CALL BLACS_PINFO( IAM, NNODES )
       CALL BLACS_GRIDINFO( CONTEXT, NPROW, NPCOL, MYROW, MYCOL )
 *

@@ -260,6 +260,16 @@
 *     ..
 *     .. Executable Statements ..
 *
+
+*
+*    Initializing the below check variables with default value to avoid taking 'NaN' values
+*
+
+      VL = ONE
+      VU = ONE
+      IL = ONE
+      IU = ONE
+
       INFO = 0
       PASSED = 'PASSED   EVR'
       CONTEXT = DESCA( CTXT_ )
