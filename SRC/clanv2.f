@@ -55,12 +55,14 @@
 *     ..
 *     .. Local Scalars ..
       COMPLEX            AA, BB, DD, T, TEMP, TEMP2, U, X, Y
-#ifdef LIBFLAME
-      COMPLEX            CDIV_TEMP1, CDIV_TEMP2
+#ifdef F2C
+      COMPLEX            CDIV_TMP1
 #endif
 *     ..
 *     .. External Functions ..
+#ifndef F2C
       COMPLEX            CLADIV
+#endif
       EXTERNAL           CLADIV
 *     ..
 *     .. External Subroutines ..
@@ -100,20 +102,15 @@
             SN = CMPLX( RZERO, RONE )*CS
          ELSE
             TEMP = SQRT( B+C )
-#ifdef LIBFLAME
-*   LibFlame's CLADIV's C-implementation takes 3 Arguments.
-*   This code is written to make compatible for LibFlame.
-*   TEMP2 - gets the o/p of the CLADIV routine
-*   CDIV_TEMP1 on LHS avoids data corruption in 'TEMP2' variable
-
-            CDIV_TEMP1 = CLADIV( TEMP2, SQRT( B ), TEMP )
+#ifdef F2C
+            CALL CLADIV( TEMP2,  SQRT( B ), TEMP )
 #else
             TEMP2 = CLADIV( SQRT( B ), TEMP )
 #endif
             CS = REAL( TEMP2 )
 
-#ifdef LIBFLAME
-            CDIV_TEMP1 = CLADIV( SN, SQRT( C ), TEMP )
+#ifdef F2C
+            CALL CLADIV( SN, SQRT( C ), TEMP )
 #else
             SN = CLADIV( SQRT( C ), TEMP )
 #endif
@@ -132,15 +129,9 @@
          IF( REAL( X )*REAL( Y )+AIMAG( X )*AIMAG( Y ).LT.RZERO )
      $      Y = -Y
 
-#ifdef LIBFLAME
-*   LibFlame's CLADIV's C-implementation takes 3 Arguments.
-*   This code is written to make compatible for LibFlame.
-*   CDIV_TEMP2 - gets the o/p of the CLADIV routine
-*   CDIV_TEMP1 on LHS avoids data corruption in o/p 'CDIV_TEMP2' variable
-
-         CDIV_TEMP1 = X+Y
-         CDIV_TEMP1 = CLADIV( CDIV_TEMP2, U, CDIV_TEMP1 )
-         T = T - CDIV_TEMP2
+#ifdef F2C
+         CALL CLADIV( CDIV_TMP1, U, ( X+Y ) )
+         T = T - CDIV_TMP1
 #else
         T = T - CLADIV( U, ( X+Y ) )
 #endif

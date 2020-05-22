@@ -28,9 +28,11 @@ CDEFS         = -DAdd_
 FC            = mpif90
 CC            = mpicc 
 NOOPT         = -O0
-FCFLAGS       = -cpp -DLIBFLAME -O3
-# Comment the above line when not linking with LibFlame and Uncomment the below line
-#FCFLAGS       = -O3 
+
+FCFLAGS       = -cpp -DF2C -O3
+# Retain the above line when linking with fortran to C converted  Lapack libraries. Comment the above line and Uncomment the below line when linking with Fortran based Lapack libraries.
+#FCFLAGS       = -cpp  -O3
+
 CCFLAGS       = -O3
 FCLOADER      = $(FC)
 CCLOADER      = $(CC)

@@ -155,10 +155,6 @@
      $                   KNT, MYCOL, MYROW, NPCOL, NPROW
       REAL               ALPHI, ALPHR, BETA, RSAFMN, SAFMIN, XNORM
 
-#ifdef LIBFLAME
-      COMPLEX            CDIV_TEMP1, CDIV_TEMP2
-#endif
-
 *     ..
 *     .. External Subroutines ..
       EXTERNAL           BLACS_GRIDINFO, CGEBR2D, CGEBS2D, PCSCAL,
@@ -166,7 +162,9 @@
 *     ..
 *     .. External Functions ..
       REAL               SLAMCH, SLAPY3
+#ifndef F2C      
       COMPLEX            CLADIV
+#endif
       EXTERNAL           CLADIV, SLAPY3, SLAMCH
 *     ..
 *     .. Intrinsic Functions ..
@@ -271,15 +269,8 @@
             TAU( INDXTAU ) = CMPLX( ( BETA-ALPHR ) / BETA,
      $                              -ALPHI / BETA )
 
-#ifdef LIBFLAME
-*   LibFlame's CLADIV's C-implementation takes 3 Arguments
-*   This code is written to make compatible for LibFlame.
-*   ALPHA - gets the o/p of the CLADIV routine
-*   CDIV_TEMP2 on LHS avoids the data corruption in the o/p 'ALPHA' value
-
-            CDIV_TEMP1 = ALPHA-BETA
-            CDIV_TEMP2 = CMPLX( ONE )
-            CDIV_TEMP2 = CLADIV( ALPHA, CDIV_TEMP2, CDIV_TEMP1 )
+#ifdef F2C
+            CALL CLADIV( ALPHA, CMPLX( ONE ), ALPHA-BETA )
 #else
             ALPHA = CLADIV( CMPLX( ONE ), ALPHA-BETA )
 #endif
@@ -295,14 +286,8 @@
             TAU( INDXTAU ) = CMPLX( ( BETA-ALPHR ) / BETA,
      $                              -ALPHI / BETA )
 
-#ifdef LIBFLAME
-*   LibFlame's CLADIV's C-implementation takes 3 Arguments
-*   This code is written to make compatible for LibFlame.
-*   ALPHA - gets the o/p of the CLADIV routine
-*   CDIV_TEMP2 on LHS avoids the data corruption in the o/p 'ALPHA' value
-            CDIV_TEMP1 = ALPHA-BETA
-            CDIV_TEMP2 = CMPLX( ONE )
-            CDIV_TEMP2 = CLADIV( ALPHA, CDIV_TEMP2, CDIV_TEMP1 )
+#ifdef F2C
+            CALL CLADIV( ALPHA, CMPLX( ONE ), ALPHA-BETA )
 #else
             ALPHA = CLADIV( CMPLX( ONE ), ALPHA-BETA )
 #endif

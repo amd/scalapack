@@ -1,5 +1,5 @@
 #Remove the previous log files
-rm -f ScalaPack_TestResults_g.txt
+rm -f ScalaPack_TestResults.txt
 rm -f ScalaPack_Build_log.txt
 echo " Building Scalapack "
 echo " "
