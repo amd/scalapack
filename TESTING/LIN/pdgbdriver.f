@@ -78,8 +78,6 @@
 *     .. Parameters ..
       INTEGER            TOTMEM
       PARAMETER          ( TOTMEM = 3000000 )
-      INTEGER            INTMEM
-      PARAMETER          ( INTMEM = 2048 )
       INTEGER            BLOCK_CYCLIC_2D, CSRC_, CTXT_, DLEN_, DTYPE_,
      $                   LLD_, MB_, M_, NB_, N_, RSRC_
       PARAMETER          ( BLOCK_CYCLIC_2D = 1, DLEN_ = 9, DTYPE_ = 1,
@@ -87,11 +85,24 @@
      $                     RSRC_ = 7, CSRC_ = 8, LLD_ = 9 )
 *
       DOUBLE PRECISION   ZERO
+#ifndef DYNAMIC_WORK_MEM_ALLOC
+      INTEGER            INTMEM
+      PARAMETER          ( INTMEM = 2048 )
       INTEGER            DBLESZ, MEMSIZ, NTESTS
       DOUBLE PRECISION   PADVAL
       PARAMETER          ( DBLESZ = 8,
      $                     MEMSIZ = TOTMEM / DBLESZ, NTESTS = 20,
      $                     PADVAL = -9923.0D+0, ZERO = 0.0D+0 )
+#else
+      INTEGER            INTMEM
+      PARAMETER          ( INTMEM = 20480 )
+      INTEGER            DBLESZ, NTESTS
+	  INTEGER, PARAMETER ::  MEMSIZ = 2100000000
+      DOUBLE PRECISION   PADVAL
+      PARAMETER          ( DBLESZ = 8,
+     $                      NTESTS = 20,
+     $                     PADVAL = -9923.0D+0, ZERO = 0.0D+0 )
+#endif
       INTEGER            INT_ONE
       PARAMETER          ( INT_ONE = 1 )
 *     ..
@@ -120,7 +131,12 @@
      $                   IERR( 1 ), NBRVAL( NTESTS ), NBVAL( NTESTS ),
      $                   NRVAL( NTESTS ), NVAL( NTESTS ),
      $                   PVAL( NTESTS ), QVAL( NTESTS )
+#ifndef DYNAMIC_WORK_MEM_ALLOC
       DOUBLE PRECISION   CTIME( 2 ), MEM( MEMSIZ ), WTIME( 2 )
+#else
+      DOUBLE PRECISION   CTIME( 2 ), WTIME( 2 )
+	  DOUBLE PRECISION, allocatable :: MEM (:)
+#endif
 *     ..
 *     .. External Subroutines ..
       EXTERNAL           BLACS_BARRIER, BLACS_EXIT, BLACS_GET,
@@ -149,6 +165,9 @@
 *
 *     Get starting information
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      allocate(MEM(MEMSIZ))
+#endif
       CALL BLACS_PINFO( IAM, NPROCS )
       IASEED = 100
       IBSEED = 200
@@ -899,6 +918,9 @@
      $      CLOSE ( NOUT )
       END IF
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      deallocate(MEM)
+#endif
       CALL BLACS_EXIT( 0 )
 *
  9999 FORMAT( 'ILLEGAL ', A6, ': ', A5, ' = ', I3,
@@ -914,7 +936,7 @@
      $        '-------- -------- -------- ------' )
  9993 FORMAT( A4,1X,A1,2X,I6,1X,I3,1X,I3,1X,I4,1X,I5,
      $                                          1X,I4,1X,I4,1X,F9.3,
-     $        F9.4,        F9.2,    F9.2, 1X, A6 )
+     $        F9.4,        F12.2,    F12.2, 1X, A6 )
  9992 FORMAT( 'Finished ', I6, ' tests, with the following results:' )
  9991 FORMAT( I5, ' tests completed and passed residual checks.' )
  9990 FORMAT( I5, ' tests completed without checking.' )

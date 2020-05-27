@@ -56,7 +56,13 @@
      $                   NBS( MAXSETSIZE ), NN( MAXSETSIZE ),
      $                   NPCOLS( MAXSETSIZE ), NPROWS( MAXSETSIZE ),
      $                   RESULT( 9 )
+
+#ifndef DYNAMIC_WORK_MEM_ALLOC
       DOUBLE PRECISION   WORK( MEMSIZ )
+#else
+      DOUBLE PRECISION, allocatable :: WORK (:)
+#endif
+
 *     ..
 *     .. External Subroutines ..
       EXTERNAL           BLACS_EXIT, BLACS_GET, BLACS_GRIDEXIT,
@@ -67,6 +73,9 @@
 *
 *     Get starting information.
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      allocate(WORK(MEMSIZ))
+#endif
       CALL BLACS_PINFO( IAM, NPROCS )
 *
 *     Open file and skip data header; read output device.
@@ -283,6 +292,9 @@
 *
       CALL BLACS_GRIDEXIT( CONTEXT )
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      deallocate(WORK)
+#endif
       CALL BLACS_EXIT( 0 )
       STOP
 *

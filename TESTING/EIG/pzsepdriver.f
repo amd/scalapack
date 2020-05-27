@@ -58,8 +58,12 @@
 *
       INTEGER            TOTMEM, ZPLXSZ, NIN
       PARAMETER          ( TOTMEM = 2000000, ZPLXSZ = 16, NIN = 11 )
+#ifndef DYNAMIC_WORK_MEM_ALLOC
       INTEGER            MEMSIZ
       PARAMETER          ( MEMSIZ = TOTMEM / ZPLXSZ )
+#else
+      INTEGER, PARAMETER ::  MEMSIZ = 21000000
+#endif
 *     ..
 *     .. Local Scalars ..
       CHARACTER          HETERO
@@ -70,7 +74,11 @@
 *     .. Local Arrays ..
 *
       INTEGER            ISEED( 4 )
+#ifndef DYNAMIC_WORK_MEM_ALLOC
       COMPLEX*16         MEM( MEMSIZ )
+#else
+      COMPLEX*16, allocatable :: MEM (:)
+#endif
 *     ..
 *     .. External Functions ..
       DOUBLE PRECISION   DLAMCH
@@ -86,6 +94,9 @@
 *
 *     Get starting information
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      allocate(MEM(MEMSIZ))
+#endif
       CALL BLACS_PINFO( IAM, NPROCS )
 *
 *
@@ -258,6 +269,9 @@
 *
       CALL BLACS_GRIDEXIT( CONTEXT )
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      deallocate(MEM)
+#endif
       CALL BLACS_EXIT( 0 )
       STOP
 *

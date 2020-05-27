@@ -62,8 +62,12 @@
 *
       INTEGER            TOTMEM, REALSZ, NIN
       PARAMETER          ( TOTMEM = 2000000, REALSZ = 8, NIN = 11 )
+#ifndef DYNAMIC_WORK_MEM_ALLOC
       INTEGER            MEMSIZ
       PARAMETER          ( MEMSIZ = TOTMEM / REALSZ )
+#else
+      INTEGER, PARAMETER ::  MEMSIZ = 21000000
+#endif
 *     ..
 *     .. Local Scalars ..
       CHARACTER          HETERO
@@ -74,7 +78,11 @@
 *     .. Local Arrays ..
 *
       INTEGER            ISEED( 4 )
+#ifndef DYNAMIC_WORK_MEM_ALLOC
       REAL               MEM( MEMSIZ )
+#else
+      REAL, allocatable :: MEM (:)
+#endif
 *     ..
 *     .. External Functions ..
       REAL               SLAMCH
@@ -90,6 +98,10 @@
 *
 *     Get starting information
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      allocate(MEM(MEMSIZ))
+	  MEM(:) = 0
+#endif
       CALL BLACS_PINFO( IAM, NPROCS )
 *
 *
@@ -266,6 +278,9 @@
 *
       CALL BLACS_GRIDEXIT( CONTEXT )
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      deallocate(MEM)
+#endif
       CALL BLACS_EXIT( 0 )
       STOP
 *

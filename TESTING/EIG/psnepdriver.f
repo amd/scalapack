@@ -61,12 +61,22 @@
       PARAMETER          ( BLOCK_CYCLIC_2D = 1, DLEN_ = 9, DT_ = 1,
      $                     CTXT_ = 2, M_ = 3, N_ = 4, MB_ = 5, NB_ = 6,
      $                     RSRC_ = 7, CSRC_ = 8, LLD_ = 9 )
+#ifndef DYNAMIC_WORK_MEM_ALLOC
       INTEGER            REALSZ, TOTMEM, MEMSIZ, NTESTS
       REAL               PADVAL, ZERO, ONE
       PARAMETER          ( REALSZ = 4, TOTMEM = 2000000,
      $                   MEMSIZ = TOTMEM / REALSZ, NTESTS = 20,
      $                   PADVAL = -9923.0E+0, ZERO = 0.0E+0,
      $                   ONE = 1.0E+0 )
+#else
+      INTEGER            REALSZ, TOTMEM, NTESTS
+	  INTEGER, PARAMETER ::  MEMSIZ = 2100000000
+      REAL               PADVAL, ZERO, ONE
+      PARAMETER          ( REALSZ = 4, TOTMEM = 2000000,
+     $                    NTESTS = 20,
+     $                   PADVAL = -9923.0E+0, ZERO = 0.0E+0,
+     $                   ONE = 1.0E+0 )
+#endif
 *     ..
 *     .. Local Scalars ..
       LOGICAL            CHECK
@@ -85,7 +95,11 @@
       INTEGER            DESCA( DLEN_ ), DESCZ( DLEN_ ), IERR( 2 ),
      $                   IDUM( 1 ), NBVAL( NTESTS ), NVAL( NTESTS ),
      $                   PVAL( NTESTS ), QVAL( NTESTS )
-      REAL               MEM ( MEMSIZ ) 
+#ifndef DYNAMIC_WORK_MEM_ALLOC
+      REAL               MEM( MEMSIZ )
+#else
+      REAL, allocatable :: MEM (:)
+#endif
       DOUBLE PRECISION   CTIME( 1 ), WTIME( 1 )
 *     ..
 *     .. External Subroutines ..
@@ -111,6 +125,9 @@
 *
 *     Get starting information
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      allocate(MEM(MEMSIZ))
+#endif
       CALL BLACS_PINFO( IAM, NPROCS )
       IASEED = 100
       CALL PSNEPINFO( OUTFILE, NOUT, NMAT, NVAL, NTESTS, NNB, NBVAL,
@@ -525,6 +542,9 @@
      $      CLOSE ( NOUT )
       END IF
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      deallocate(MEM)
+#endif
       CALL BLACS_EXIT( 0 )
 *
  9999 FORMAT( 'ILLEGAL ', A6, ': ', A5, ' = ', I3,
@@ -536,7 +556,7 @@
      $      I11 )
  9995 FORMAT( 'TIME     N  NB    P    Q NEP Time   MFLOPS  CHECK' )
  9994 FORMAT( '---- ----- --- ---- ---- -------- -------- ------' )
- 9993 FORMAT( A4, 1X, I5, 1X, I3, 1X, I4, 1X, I4, 1X, F8.2, 1X, F8.2,
+ 9993 FORMAT( A4, 1X, I5, 1X, I5, 1X, I4, 1X, I4, 1X, F8.2, 1X, F12.2,
      $      1X, A6 )
  9992 FORMAT( 'Finished ', I6, ' tests, with the following results:' )
  9991 FORMAT( I5, ' tests completed and passed residual checks.' )

@@ -56,7 +56,11 @@
 *     .. Local Arrays ..
 *
       INTEGER            ISEED( 4 )
+#ifndef DYNAMIC_WORK_MEM_ALLOC
       DOUBLE PRECISION   MEM( MEMSIZ )
+#else
+      DOUBLE PRECISION, allocatable :: MEM (:)
+#endif
 *     ..
 *     .. External Functions ..
       DOUBLE PRECISION   DLAMCH
@@ -72,6 +76,9 @@
 *
 *     Get starting information
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      allocate(MEM(MEMSIZ))
+#endif
       CALL BLACS_PINFO( IAM, NPROCS )
 *
 *
@@ -231,6 +238,9 @@ c      CALL IEEE_FLAGS( 'clear', 'exception', 'underflow', ' ')
 *
       CALL BLACS_GRIDEXIT( CONTEXT )
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      deallocate(MEM)
+#endif
       CALL BLACS_EXIT( 0 )
       STOP
 *

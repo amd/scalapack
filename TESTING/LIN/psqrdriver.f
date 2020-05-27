@@ -68,11 +68,20 @@
       PARAMETER          ( BLOCK_CYCLIC_2D = 1, DLEN_ = 9, DTYPE_ = 1,
      $                     CTXT_ = 2, M_ = 3, N_ = 4, MB_ = 5, NB_ = 6,
      $                     RSRC_ = 7, CSRC_ = 8, LLD_ = 9 )
+#ifndef DYNAMIC_WORK_MEM_ALLOC
       INTEGER            INTGSZ, MEMSIZ, NTESTS, REALSZ, TOTMEM
       REAL               PADVAL
       PARAMETER          ( INTGSZ = 4, REALSZ = 4, TOTMEM = 2000000,
      $                     MEMSIZ = TOTMEM / REALSZ, NTESTS = 20,
      $                     PADVAL = -9923.0E+0 )
+#else
+      INTEGER            INTGSZ, NTESTS, REALSZ, TOTMEM
+	  INTEGER, PARAMETER ::  MEMSIZ = 2100000
+      REAL               PADVAL
+      PARAMETER          ( INTGSZ = 4, REALSZ = 4, TOTMEM = 2000000,
+     $                     NTESTS = 20,
+     $                     PADVAL = -9923.0E+0 )
+#endif
 *     ..
 *     .. Local Scalars ..
       CHARACTER*2        FACT
@@ -96,7 +105,11 @@
       INTEGER            DESCA( DLEN_ ), IERR( 1 ), MBVAL( NTESTS ),
      $                   MVAL( NTESTS ), NBVAL( NTESTS ),
      $                   NVAL( NTESTS ), PVAL( NTESTS ), QVAL( NTESTS )
+#ifndef DYNAMIC_WORK_MEM_ALLOC
       REAL               MEM( MEMSIZ )
+#else
+      REAL, allocatable :: MEM (:)
+#endif
       DOUBLE PRECISION   CTIME( 1 ), WTIME( 1 )
 *     ..
 *     .. External Subroutines ..
@@ -126,6 +139,9 @@
 *
 *     Get starting information
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      allocate(MEM(MEMSIZ))
+#endif
       CALL BLACS_PINFO( IAM, NPROCS )
       IASEED = 100
       CALL PSQRINFO( OUTFILE, NOUT, NFACT, FACTOR, NTESTS, NMAT, MVAL,
@@ -836,6 +852,9 @@
      $      CLOSE ( NOUT )
       END IF
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      deallocate(MEM)
+#endif
       CALL BLACS_EXIT( 0 )
 *
  9999 FORMAT( 'ILLEGAL ', A6, ': ', A5, ' = ', I3,

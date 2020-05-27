@@ -47,6 +47,7 @@
       REAL               THRESH
 *     ..
 *     .. Parameters ..
+#ifndef DYNAMIC_WORK_MEM_ALLOC
       INTEGER            MAXSETSIZE, NIN, DBLSIZ, TOTMEM, MEMSIZ
       PARAMETER          ( MAXSETSIZE = 50, NIN = 11, DBLSIZ = 8,
      $                   TOTMEM = 2000000, MEMSIZ = TOTMEM / DBLSIZ )
@@ -57,6 +58,19 @@
      $                   NPCOLS( MAXSETSIZE ), NPROWS( MAXSETSIZE ),
      $                   RESULT( 9 )
       REAL               WORK( MEMSIZ )
+#else
+      INTEGER            MAXSETSIZE, NIN, DBLSIZ, TOTMEM
+	  INTEGER, PARAMETER ::  MEMSIZ = 2100000000
+      PARAMETER          ( MAXSETSIZE = 50, NIN = 11, DBLSIZ = 8,
+     $                   TOTMEM = 2000000 )
+*     ..
+*     .. Local Arrays ..
+      INTEGER            ISEED( 4 ), MM( MAXSETSIZE ),
+     $                   NBS( MAXSETSIZE ), NN( MAXSETSIZE ),
+     $                   NPCOLS( MAXSETSIZE ), NPROWS( MAXSETSIZE ),
+     $                   RESULT( 9 )
+      REAL, allocatable :: WORK (:)
+#endif
 *     ..
 *     .. External Subroutines ..
       EXTERNAL           BLACS_EXIT, BLACS_GET, BLACS_GRIDEXIT,
@@ -67,6 +81,9 @@
 *
 *     Get starting information.
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      allocate(WORK(MEMSIZ))
+#endif
       CALL BLACS_PINFO( IAM, NPROCS )
 *
 *     Open file and skip data header; read output device.
@@ -283,6 +300,9 @@
 *
       CALL BLACS_GRIDEXIT( CONTEXT )
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      deallocate (WORK)
+#endif
       CALL BLACS_EXIT( 0 )
       STOP
 *

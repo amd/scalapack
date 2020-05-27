@@ -80,12 +80,22 @@
      $                     RSRC_ = 7, CSRC_ = 8, LLD_ = 9 )
 *
       DOUBLE PRECISION   ZERO
+#ifndef DYNAMIC_WORK_MEM_ALLOC
       INTEGER            MEMSIZ, NTESTS, ZPLXSZ
       COMPLEX*16         PADVAL
       PARAMETER          ( ZPLXSZ = 16,
      $                     MEMSIZ = TOTMEM / ZPLXSZ, NTESTS = 20,
      $                     PADVAL = ( -9923.0D+0, -9923.0D+0 ),
      $                     ZERO = 0.0D+0 )
+#else
+      INTEGER            NTESTS, ZPLXSZ
+	  INTEGER, PARAMETER ::  MEMSIZ = 2100000000
+      COMPLEX*16         PADVAL
+      PARAMETER          ( ZPLXSZ = 16,
+     $                      NTESTS = 20,
+     $                     PADVAL = ( -9923.0D+0, -9923.0D+0 ),
+     $                     ZERO = 0.0D+0 )
+#endif
       INTEGER            INT_ONE
       PARAMETER          ( INT_ONE = 1 )
 *     ..
@@ -114,7 +124,11 @@
      $                   NRVAL( NTESTS ), NVAL( NTESTS ),
      $                   PVAL( NTESTS ), QVAL( NTESTS )
       DOUBLE PRECISION   CTIME( 2 ), WTIME( 2 )
+#ifndef DYNAMIC_WORK_MEM_ALLOC
       COMPLEX*16         MEM( MEMSIZ )
+#else
+      COMPLEX*16, allocatable :: MEM (:)
+#endif
 *     ..
 *     .. External Subroutines ..
       EXTERNAL           BLACS_BARRIER, BLACS_EXIT, BLACS_GET,
@@ -143,6 +157,9 @@
 *
 *     Get starting information
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      allocate(MEM(MEMSIZ))
+#endif
       CALL BLACS_PINFO( IAM, NPROCS )
       IASEED = 100
       IBSEED = 200
@@ -900,6 +917,9 @@
      $      CLOSE ( NOUT )
       END IF
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      deallocate(MEM)
+#endif
       CALL BLACS_EXIT( 0 )
 *
  9999 FORMAT( 'ILLEGAL ', A6, ': ', A5, ' = ', I3,
@@ -913,9 +933,9 @@
      $        'Slv Time   MFLOPS   MFLOP2  CHECK' )
  9994 FORMAT( '---- -- ------  --- ---  ---- ----- ---- ---- -------- ',
      $        '-------- -------- -------- ------' )
- 9993 FORMAT( A4,1X,A1,2X,I6,1X,I3,1X,I3,1X,I4,1X,I5,
+ 9993 FORMAT( A4,1X,A1,2X,I6,1X,I3,1X,I3,1X,I5,1X,I5,
      $                                          1X,I4,1X,I4,1X,F9.3,
-     $        F9.4,        F9.2,    F9.2, 1X, A6 )
+     $        F9.4,        F12.2,    F12.2, 1X, A6 )
  9992 FORMAT( 'Finished ', I6, ' tests, with the following results:' )
  9991 FORMAT( I5, ' tests completed and passed residual checks.' )
  9990 FORMAT( I5, ' tests completed without checking.' )

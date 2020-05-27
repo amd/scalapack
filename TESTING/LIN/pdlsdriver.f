@@ -65,6 +65,7 @@
       PARAMETER          ( BLOCK_CYCLIC_2D = 1, DLEN_ = 9, DTYPE_ = 1,
      $                     CTXT_ = 2, M_ = 3, N_ = 4, MB_ = 5, NB_ = 6,
      $                     RSRC_ = 7, CSRC_ = 8, LLD_ = 9 )
+#ifndef DYNAMIC_WORK_MEM_ALLOC
       INTEGER            DBLESZ, MEMSIZ, NTESTS, TOTMEM
       DOUBLE PRECISION   PADVAL
       DOUBLE PRECISION   ONE, ZERO
@@ -72,6 +73,16 @@
      $                     MEMSIZ = TOTMEM / DBLESZ, NTESTS = 20,
      $                     PADVAL = -9923.0D+0 )
       PARAMETER          ( ONE = 1.0D+0, ZERO = 0.0D+0 )
+#else
+      INTEGER            DBLESZ, NTESTS, TOTMEM
+	  INTEGER, PARAMETER ::  MEMSIZ = 2100000000
+      DOUBLE PRECISION   PADVAL
+      DOUBLE PRECISION   ONE, ZERO
+      PARAMETER          ( DBLESZ = 8, TOTMEM = 2000000,
+     $                      NTESTS = 20,
+     $                     PADVAL = -9923.0D+0 )
+      PARAMETER          ( ONE = 1.0D+0, ZERO = 0.0D+0 )
+#endif
 *     ..
 *     .. Local Scalars ..
       LOGICAL            CHECK, TPSD
@@ -96,8 +107,14 @@
      $                   NBRVAL( NTESTS ), NBVAL( NTESTS ),
      $                   NRVAL( NTESTS ), NVAL( NTESTS ),
      $                   PVAL( NTESTS ), QVAL( NTESTS )
+#ifndef DYNAMIC_WORK_MEM_ALLOC
       DOUBLE PRECISION   CTIME( 1 ), MEM( MEMSIZ ), RESULT( 2 ),
      $                   WTIME( 1 )
+#else
+      DOUBLE PRECISION   CTIME( 1 ), RESULT( 2 ),
+     $                   WTIME( 1 )
+	 DOUBLE PRECISION, allocatable :: MEM (:)
+#endif
 *     ..
 *     .. External Subroutines ..
       EXTERNAL           BLACS_BARRIER, BLACS_EXIT, BLACS_GET,
@@ -124,6 +141,9 @@
 *
 *     Get starting information
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      allocate(MEM(MEMSIZ))
+#endif
       CALL BLACS_PINFO( IAM, NPROCS )
 *
       IASEED = 100
@@ -1041,6 +1061,9 @@
      $      CLOSE ( NOUT )
       END IF
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      deallocate(MEM)
+#endif
       CALL BLACS_EXIT( 0 )
 *
  9999 FORMAT( 'ILLEGAL ', A6, ': ', A5, ' = ', I3,
@@ -1054,8 +1077,8 @@
      $        'LS Time     MFLOPS  CHECK' )
  9994 FORMAT( '---- ----- ------ ------ --- ----- ----- ----- ----- ',
      $        '--------- -------- ------' )
- 9993 FORMAT( A4, 3X, A1, 3X, I6, 1X, I6, 1X, I3, 1X, I5, 1X, I5, 1X,
-     $        I5, 1X, I5, 1X, F9.2, 1X, F8.2, 1X, A6 )
+ 9993 FORMAT( A4, 3X, A1, 3X, I6, 1X, I6, 1X, I5, 1X, I5, 1X, I5, 1X,
+     $        I5, 1X, I5, 1X, F9.2, 1X, F12.2, 1X, A6 )
  9992 FORMAT( 'Finished', I6, ' tests, with the following results:' )
  9991 FORMAT( I5, ' tests completed and passed residual checks.' )
  9990 FORMAT( I5, ' tests completed without checking.' )

@@ -78,8 +78,6 @@
 *     .. Parameters ..
       INTEGER            TOTMEM
       PARAMETER          ( TOTMEM = 3000000 )
-      INTEGER            INTMEM
-      PARAMETER          ( INTMEM = 2048 )
       INTEGER            BLOCK_CYCLIC_2D, CSRC_, CTXT_, DLEN_, DTYPE_,
      $                   LLD_, MB_, M_, NB_, N_, RSRC_
       PARAMETER          ( BLOCK_CYCLIC_2D = 1, DLEN_ = 9, DTYPE_ = 1,
@@ -87,11 +85,24 @@
      $                     RSRC_ = 7, CSRC_ = 8, LLD_ = 9 )
 *
       REAL               ZERO
+#ifndef DYNAMIC_WORK_MEM_ALLOC
+      INTEGER            INTMEM
+      PARAMETER          ( INTMEM = 2048 )
       INTEGER            MEMSIZ, NTESTS, REALSZ
       REAL               PADVAL
       PARAMETER          ( REALSZ = 4,
      $                     MEMSIZ = TOTMEM / REALSZ, NTESTS = 20,
      $                     PADVAL = -9923.0E+0, ZERO = 0.0E+0 )
+#else
+      INTEGER            INTMEM
+      PARAMETER          ( INTMEM = 20480 )
+      INTEGER            NTESTS, REALSZ
+	  INTEGER, PARAMETER ::  MEMSIZ = 21000000
+      REAL               PADVAL
+      PARAMETER          ( REALSZ = 4,
+     $                     NTESTS = 20,
+     $                     PADVAL = -9923.0E+0, ZERO = 0.0E+0 )
+#endif
       INTEGER            INT_ONE
       PARAMETER          ( INT_ONE = 1 )
 *     ..
@@ -119,7 +130,11 @@
      $                   IERR( 1 ), NBRVAL( NTESTS ), NBVAL( NTESTS ),
      $                   NRVAL( NTESTS ), NVAL( NTESTS ),
      $                   PVAL( NTESTS ), QVAL( NTESTS )
+#ifndef DYNAMIC_WORK_MEM_ALLOC
       REAL               MEM( MEMSIZ )
+#else
+      REAL, allocatable :: MEM (:)
+#endif
       DOUBLE PRECISION   CTIME( 2 ), WTIME( 2 )
 *     ..
 *     .. External Subroutines ..
@@ -149,6 +164,9 @@
 *
 *     Get starting information
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      allocate(MEM(MEMSIZ))
+#endif
       CALL BLACS_PINFO( IAM, NPROCS )
       IASEED = 100
       IBSEED = 200
@@ -899,6 +917,9 @@
      $      CLOSE ( NOUT )
       END IF
 *
+#ifdef DYNAMIC_WORK_MEM_ALLOC
+      deallocate(MEM)
+#endif
       CALL BLACS_EXIT( 0 )
 *
  9999 FORMAT( 'ILLEGAL ', A6, ': ', A5, ' = ', I3,
