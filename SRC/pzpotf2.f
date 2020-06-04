@@ -152,6 +152,9 @@
      $                   IOFFA, IROFF, J, JJA, LDA, MYCOL, MYROW,
      $                   NPCOL, NPROW
       DOUBLE PRECISION   AJJ
+#ifdef F2C_COMPLEX
+      COMPLEX*16         TMP
+#endif
 *     ..
 *     .. External Subroutines ..
       EXTERNAL           BLACS_ABORT, BLACS_GRIDINFO, CHK1MAT, IGEBR2D,
@@ -165,6 +168,9 @@
       LOGICAL            LSAME
       COMPLEX*16         ZDOTC
       EXTERNAL           LSAME, ZDOTC
+#ifdef F2C_COMPLEX
+      EXTERNAL           ZDOTC_F2C
+#endif
 *     ..
 *     .. Executable Statements ..
 *
@@ -233,8 +239,14 @@
 *
 *                 Compute U(J,J) and test for non-positive-definiteness.
 *
+#ifdef F2C_COMPLEX
+                  CALL ZDOTC_F2C( TMP, J-JA, A( IOFFA ), 1, 
+     $                                     A( IOFFA ), 1 )
+                  AJJ = DBLE( A( IDIAG ) ) - TMP
+#else
                   AJJ = DBLE( A( IDIAG ) ) -
      $                  ZDOTC( J-JA, A( IOFFA ), 1, A( IOFFA ), 1 )
+#endif
                   IF( AJJ.LE.ZERO ) THEN
                      A( IDIAG ) = AJJ
                      INFO = J - JA + 1
@@ -299,8 +311,14 @@
 *
 *                 Compute L(J,J) and test for non-positive-definiteness.
 *
+#ifdef F2C_COMPLEX
+                  CALL ZDOTC_F2C( TMP, J-JA, A( IOFFA ), LDA, 
+     &                               A( IOFFA ), LDA )
+                  AJJ = DBLE( A( IDIAG ) ) - TMP
+#else
                   AJJ = DBLE( A( IDIAG ) ) -
      $                  ZDOTC( J-JA, A( IOFFA ), LDA, A( IOFFA ), LDA )
+#endif
                   IF ( AJJ.LE.ZERO ) THEN
                      A( IDIAG ) = AJJ
                      INFO = J - JA + 1

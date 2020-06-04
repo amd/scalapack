@@ -152,6 +152,9 @@
      $                   IOFFA, IROFF, J, JJA, LDA, MYCOL, MYROW,
      $                   NPCOL, NPROW
       REAL               AJJ
+#ifdef F2C_COMPLEX
+      COMPLEX            TMP
+#endif
 *     ..
 *     .. External Subroutines ..
       EXTERNAL           BLACS_ABORT, BLACS_GRIDINFO, CHK1MAT, CGEMV,
@@ -165,6 +168,9 @@
       LOGICAL            LSAME
       COMPLEX            CDOTC
       EXTERNAL           LSAME, CDOTC
+#ifdef F2C_COMPLEX
+      EXTERNAL           CDOTC_F2C
+#endif
 *     ..
 *     .. Executable Statements ..
 *
@@ -233,8 +239,14 @@
 *
 *                 Compute U(J,J) and test for non-positive-definiteness.
 *
+#ifdef F2C_COMPLEX
+                  CALL CDOTC_F2C( TMP, J-JA, A( IOFFA ), 1,
+     $                             A( IOFFA ), 1 )
+                  AJJ = REAL( A( IDIAG ) ) - TMP
+#else
                   AJJ = REAL( A( IDIAG ) ) -
      $                  CDOTC( J-JA, A( IOFFA ), 1, A( IOFFA ), 1 )
+#endif
                   IF( AJJ.LE.ZERO ) THEN
                      A( IDIAG ) = AJJ
                      INFO = J - JA + 1
@@ -299,8 +311,14 @@
 *
 *                 Compute L(J,J) and test for non-positive-definiteness.
 *
+#ifdef F2C_COMPLEX
+                  CALL CDOTC_F2C( TMP, J-JA, A( IOFFA ), LDA, 
+     $                               A( IOFFA ), LDA )
+                  AJJ = REAL( A( IDIAG ) ) - TMP
+#else
                   AJJ = REAL( A( IDIAG ) ) -
      $                  CDOTC( J-JA, A( IOFFA ), LDA, A( IOFFA ), LDA )
+#endif
                   IF ( AJJ.LE.ZERO ) THEN
                      A( IDIAG ) = AJJ
                      INFO = J - JA + 1

@@ -379,6 +379,9 @@
 *     ..
 *     .. Local Arrays ..
       INTEGER            DESCA_1XP( 7 ), PARAM_CHECK( 7, 3 )
+#ifdef F2C_COMPLEX
+      COMPLEX*16         TMP
+#endif
 *     ..
 *     .. External Subroutines ..
       EXTERNAL           BLACS_GET, BLACS_GRIDEXIT, BLACS_GRIDINFO,
@@ -392,6 +395,9 @@
       INTEGER            NUMROC
       COMPLEX*16         ZDOTC
       EXTERNAL           LSAME, NUMROC, ZDOTC
+#ifdef F2C_COMPLEX
+      EXTERNAL           ZDOTC_F2C
+#endif
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          ICHAR, MIN, MOD
@@ -741,8 +747,13 @@
 *
 *         Calculate the update block for previous proc, E_i = GL_i{GU_i}
 *
+#ifdef F2C_COMPLEX
+          CALL ZDOTC_F2C( TMP, ODD_SIZE, AF( 1 ), 1, AF( WORK_U+1 ), 1 )
+          AF( ODD_SIZE+3 ) = -CONE * TMP
+#else
           AF( ODD_SIZE+3 ) = -CONE *
      $        ZDOTC( ODD_SIZE, AF( 1 ), 1, AF( WORK_U+1 ), 1 )
+#endif
 *
 *
 *         Initiate send of E_i to previous processor to overlap

@@ -376,6 +376,9 @@
      $                   NB, NP, NPCOL, NPROW, NP_SAVE, ODD_SIZE,
      $                   PART_OFFSET, PART_SIZE, RETURN_CODE, STORE_N_A,
      $                   TEMP, WORK_SIZE_MIN, WORK_U
+#ifdef F2C_COMPLEX
+      COMPLEX            TMP
+#endif
 *     ..
 *     .. Local Arrays ..
       INTEGER            DESCA_1XP( 7 ), PARAM_CHECK( 7, 3 )
@@ -392,6 +395,10 @@
       INTEGER            NUMROC
       COMPLEX            CDOTC
       EXTERNAL           CDOTC, LSAME, NUMROC
+#ifdef F2C_COMPLEX
+      EXTERNAL           CDOTC_F2C
+#endif
+
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          ICHAR, MIN, MOD
@@ -741,8 +748,14 @@
 *
 *         Calculate the update block for previous proc, E_i = GL_i{GU_i}
 *
+#ifdef F2C_COMPLEX
+           CALL CDOTC_F2C( TMP, ODD_SIZE, AF( 1 ), 1, 
+     $                     AF( WORK_U+1 ), 1 )
+           AF( ODD_SIZE+3 ) = -CONE * TMP
+#else
           AF( ODD_SIZE+3 ) = -CONE *
      $        CDOTC( ODD_SIZE, AF( 1 ), 1, AF( WORK_U+1 ), 1 )
+#endif
 *
 *
 *         Initiate send of E_i to previous processor to overlap

@@ -24,10 +24,17 @@
 *     .. External Functions ..
       COMPLEX            CDOTC
       EXTERNAL           CDOTC
+#ifdef F2C_COMPLEX
+      EXTERNAL           CDOTC_F2C
+#endif
 *     ..
 *     .. Executable Statements ..
 *
+#ifdef F2C_COMPLEX
+      CALL CDOTC_F2C ( DOTC, N, X, INCX, Y, INCY )
+#else
       DOTC = CDOTC( N, X, INCX, Y, INCY )
+#endif
 *
       RETURN
 *

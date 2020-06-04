@@ -125,6 +125,9 @@
      $                     CTXT_ = 2, M_ = 3, N_ = 4, MB_ = 5, NB_ = 6,
      $                     RSRC_ = 7, CSRC_ = 8, LLD_ = 9 )
       COMPLEX*16         ONE
+#ifdef F2C_COMPLEX
+      COMPLEX*16         TMP
+#endif
       PARAMETER          ( ONE = ( 1.0D+0, 0.0D+0 ) )
 *     ..
 *     .. Local Scalars ..
@@ -140,6 +143,9 @@
       LOGICAL            LSAME
       COMPLEX*16         ZDOTC
       EXTERNAL           LSAME, ZDOTC
+#ifdef F2C_COMPLEX
+      EXTERNAL           ZDOTC_F2C
+#endif
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          DCMPLX, DBLE
@@ -170,8 +176,14 @@
             DO 10 NA = N-1, 1, -1
                AII = A( IDIAG )
                ICURR = IDIAG + LDA
+#ifdef F2C_COMPLEX
+               CALL ZDOTC_F2C(TMP, NA, A( ICURR ), LDA,
+     $                               A( ICURR ), LDA )
+               A( IDIAG ) = AII*AII + DBLE( TMP )
+#else
                A( IDIAG ) = AII*AII + DBLE( ZDOTC( NA, A( ICURR ), LDA,
      $                                           A( ICURR ), LDA ) )
+#endif
                CALL ZLACGV( NA, A( ICURR ), LDA )
                CALL ZGEMV( 'No transpose', N-NA-1, NA, ONE,
      $                     A( IOFFA+LDA ), LDA, A( ICURR ), LDA,
@@ -190,8 +202,14 @@
             DO 20 NA = 1, N-1
                AII = A( IDIAG )
                ICURR = IDIAG + 1
+#ifdef F2C_COMPLEX
+               CALL  ZDOTC_F2C( TMP, N-NA, A( ICURR ), 1,
+     $                             A( ICURR ), 1 ) 
+               A( IDIAG ) = AII*AII + DBLE( TMP)
+#else
                A( IDIAG ) = AII*AII + DBLE( ZDOTC( N-NA, A( ICURR ), 1,
      $                                             A( ICURR ), 1 ) )
+#endif
                CALL ZLACGV( NA-1, A( IOFFA ), LDA )
                CALL ZGEMV( 'Conjugate transpose', N-NA, NA-1, ONE,
      $                     A( IOFFA+1 ), LDA, A( ICURR ), 1,

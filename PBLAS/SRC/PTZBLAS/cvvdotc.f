@@ -57,10 +57,19 @@
 *     .. External Functions ..
       COMPLEX            CDOTC
       EXTERNAL           CDOTC
+#ifdef F2C_COMPLEX
+      COMPLEX            TMP
+      EXTERNAL           CDOTC_F2C
+#endif
 *     ..
 *     .. Executable Statements ..
 *
+#ifdef F2C_COMPLEX
+      CALL CDOTC_F2C( TMP, N, X, INCX, Y, INCY )
+      DOT = DOT + TMP
+#else
       DOT = DOT + CDOTC( N, X, INCX, Y, INCY )
+#endif
 *
       RETURN
 *

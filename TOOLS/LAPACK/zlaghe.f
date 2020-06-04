@@ -65,6 +65,9 @@
       INTEGER            I, J
       DOUBLE PRECISION   WN
       COMPLEX*16         ALPHA, TAU, WA, WB
+#ifdef F2C_COMPLEX
+      COMPLEX*16         TMP
+#endif
 *     ..
 *     .. External Subroutines ..
       EXTERNAL           XERBLA, ZAXPY, ZGEMV, ZGERC, ZHEMV, ZHER2,
@@ -74,6 +77,9 @@
       DOUBLE PRECISION   DZNRM2
       COMPLEX*16         ZDOTC
       EXTERNAL           DZNRM2, ZDOTC
+#ifdef F2C_COMPLEX
+      EXTERNAL           ZDOTC_F2C
+#endif
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          ABS, DBLE, DCONJG, MAX
@@ -134,7 +140,12 @@
 *
 *        compute  v := y - 1/2 * tau * ( y, u ) * u
 *
+#ifdef F2C_COMPLEX
+         CALL ZDOTC_F2C( TMP, N-I+1, WORK( N+1 ), 1, WORK, 1 )
+         ALPHA = -HALF*TAU*TMP
+#else
          ALPHA = -HALF*TAU*ZDOTC( N-I+1, WORK( N+1 ), 1, WORK, 1 )
+#endif
          CALL ZAXPY( N-I+1, ALPHA, WORK, 1, WORK( N+1 ), 1 )
 *
 *        apply the transformation as a rank-2 update to A(i:n,i:n)
@@ -176,7 +187,12 @@
 *
 *        compute  v := y - 1/2 * tau * ( y, u ) * u
 *
+#ifdef F2C_COMPLEX
+         CALL ZDOTC_F2C( TMP, N-K-I+1, WORK, 1, A( K+I, I ), 1 )
+         ALPHA = -HALF*TAU*TMP
+#else
          ALPHA = -HALF*TAU*ZDOTC( N-K-I+1, WORK, 1, A( K+I, I ), 1 )
+#endif
          CALL ZAXPY( N-K-I+1, ALPHA, A( K+I, I ), 1, WORK, 1 )
 *
 *        apply hermitian rank-2 update to A(k+i:n,k+i:n)

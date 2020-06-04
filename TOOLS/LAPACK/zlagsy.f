@@ -57,6 +57,9 @@
 *
 *     .. Parameters ..
       COMPLEX*16         ZERO, ONE, HALF
+#ifdef F2C_COMPLEX
+      COMPLEX*16         TMP
+#endif
       PARAMETER          ( ZERO = ( 0.0D+0, 0.0D+0 ),
      $                   ONE = ( 1.0D+0, 0.0D+0 ),
      $                   HALF = ( 0.5D+0, 0.0D+0 ) )
@@ -74,6 +77,9 @@
       DOUBLE PRECISION   DZNRM2
       COMPLEX*16         ZDOTC
       EXTERNAL           DZNRM2, ZDOTC
+#ifdef F2C_COMPLEX
+      EXTERNAL           ZDOTC_F2C
+#endif
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          ABS, DBLE, MAX
@@ -136,7 +142,12 @@
 *
 *        compute  v := y - 1/2 * tau * ( u, y ) * u
 *
+#ifdef F2C_COMPLEX
+         CALL ZDOTC_F2C( TMP, N-I+1, WORK, 1, WORK( N+1 ), 1 )
+         ALPHA = -HALF*TAU*TMP
+#else
          ALPHA = -HALF*TAU*ZDOTC( N-I+1, WORK, 1, WORK( N+1 ), 1 )
+#endif
          CALL ZAXPY( N-I+1, ALPHA, WORK, 1, WORK( N+1 ), 1 )
 *
 *        apply the transformation as a rank-2 update to A(i:n,i:n)
@@ -188,7 +199,12 @@
 *
 *        compute  v := y - 1/2 * tau * ( u, y ) * u
 *
+#ifdef F2C_COMPLEX
+         CALL ZDOTC_F2C( TMP, N-K-I+1, A( K+I, I ), 1, WORK, 1 )
+         ALPHA = -HALF*TAU*TMP
+#else
          ALPHA = -HALF*TAU*ZDOTC( N-K-I+1, A( K+I, I ), 1, WORK, 1 )
+#endif
          CALL ZAXPY( N-K-I+1, ALPHA, A( K+I, I ), 1, WORK, 1 )
 *
 *        apply symmetric rank-2 update to A(k+i:n,k+i:n)

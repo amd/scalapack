@@ -4,6 +4,14 @@ rm -f ScalaPack_Build_log.txt
 echo " Building Scalapack "
 echo " "
 
+# In some machines, with the default stack of 8192 bytes, test application
+# face shortage of stack to allocate memory for the local variables. This leads
+# to run time issues. Below command avoids the same.
+ulimit -s unlimited
+
+# Display the stack size on the terminal 
+ulimit -s
+
 make clean  >> ScalaPack_Build_log.txt
 
 make  >> ScalaPack_Build_log.txt

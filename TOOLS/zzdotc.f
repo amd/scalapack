@@ -24,10 +24,17 @@
 *     .. External Functions ..
       COMPLEX*16         ZDOTC
       EXTERNAL           ZDOTC
+#ifdef F2C_COMPLEX
+      EXTERNAL           ZDOTC_F2C
+#endif
 *     ..
 *     .. Executable Statements ..
 *
+#ifdef F2C_COMPLEX
+      CALL ZDOTC_F2C( DOTC, N, X, INCX, Y, INCY )
+#else
       DOTC = ZDOTC( N, X, INCX, Y, INCY )
+#endif
 *
       RETURN
 *
