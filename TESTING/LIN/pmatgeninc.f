@@ -55,7 +55,12 @@
       PARAMETER        ( IPOW15=2**15, IPOW16=2**16, IPOW30=2**30 )
 *     ..
 *     .. Local Scalars ..
-      INTEGER            KT, LT
+
+*     Declare as 8 byte Integer to avoid overflow during
+*     multiply operation.
+* 
+      INTEGER(KIND=8)     KT, LT
+
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          MOD
