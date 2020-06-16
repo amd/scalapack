@@ -1397,6 +1397,15 @@ void           PB_CpgemmAB     ( PBTYP_T *, char *,    char *,
                                  int,       int *,     char *,
                                  char *,    int,       int,
                                  int * );
+void           PB_CpgemmlaAB   ( PBTYP_T *, char *,    char *,
+                                 char *,    char *,    int,
+                                 int,       int,       char *,
+                                 char *,    int,       int,
+                                 int *,     char *,    int,
+                                 int,       int *,     char *,
+                                 char *,    int,       int,
+                                 int *,     pd_panel * panel,
+                                 char * );
 void           PB_CpgemmAC     ( PBTYP_T *, char *,    char *,
                                  char *,    char *,    int,
                                  int,       int,       char *,
@@ -1405,6 +1414,15 @@ void           PB_CpgemmAC     ( PBTYP_T *, char *,    char *,
                                  int,       int *,     char *,
                                  char *,    int,       int,
                                  int * );
+void           PB_CpgemmlaAC   ( PBTYP_T *, char *,    char *,
+                                 char *,    char *,    int,
+                                 int,       int,       char *,
+                                 char *,    int,       int,
+                                 int *,     char *,    int,
+                                 int,       int *,     char *,
+                                 char *,    int,       int,
+                                 int *,     pd_panel * panel,
+                                 char * );
 void           PB_CpgemmBC     ( PBTYP_T *, char *,    char *,
                                  char *,    char *,    int,
                                  int,       int,       char *,
@@ -1413,6 +1431,15 @@ void           PB_CpgemmBC     ( PBTYP_T *, char *,    char *,
                                  int,       int *,     char *,
                                  char *,    int,       int,
                                  int * );
+void           PB_CpgemmlaBC   ( PBTYP_T *, char *,    char *,
+                                 char *,    char *,    int,
+                                 int,       int,       char *,
+                                 char *,    int,       int,
+                                 int *,     char *,    int,
+                                 int,       int *,     char *,
+                                 char *,    int,       int,
+                                 int *,     pd_panel * panel,
+                                 char * );
 void           PB_CpsymmAB     ( PBTYP_T *, char *,    char *,
                                  char *,    char *,    int,
                                  int,       char *,    char *,
@@ -1471,6 +1498,13 @@ void           PB_CptrsmAB     ( PBTYP_T *, char *,    char *,
                                  char *,    int,       int,
                                  int *,     char *,    int,
                                  int,       int * );
+void           PB_CptrsmlaAB  ( PBTYP_T *, char *,    char *,
+                                 char *,    char *,    char *,
+                                 int,       int,       char *,
+                                 char *,    int,       int,
+                                 int *,     char *,    int,
+                                 int,       int *,     
+				 pd_panel * panel,     char * );
 void           PB_CptrsmAB0    ( PBTYP_T *, char *,    char *,
                                  char *,    int,       int,
                                  char *,    char *,    int,
@@ -1489,6 +1523,13 @@ void           PB_CptrsmB      ( PBTYP_T *, char *,    char *,
                                  char *,    int,       int,
                                  int *,     char *,    int,
                                  int,       int * );
+void           PB_CptrsmlaB   ( PBTYP_T *, char *,    char *,
+                                 char *,    char *,    char *,
+                                 int,       int,       char *,
+                                 char *,    int,       int,
+                                 int *,     char *,    int,
+                                 int,       int *,     
+				 pd_panel  * panel,     char *);
 #else
 
 F_VOID_FCT     immadd_         ();
@@ -1654,8 +1695,11 @@ void           PB_Cptrsv       ();
 void           PB_Cptrsm       ();
 
 void           PB_CpgemmAB     ();
+void           PB_CpgemmlaAB   ();
 void           PB_CpgemmAC     ();
+void           PB_CpgemmlaAC   ();
 void           PB_CpgemmBC     ();
+void           PB_CpgemmlaBC   ();
 void           PB_CpsymmAB     ();
 void           PB_CpsymmBC     ();
 void           PB_CpsyrkA      ();
@@ -1665,9 +1709,11 @@ void           PB_Cpsyr2kAC    ();
 void           PB_CptrmmAB     ();
 void           PB_CptrmmB      ();
 void           PB_CptrsmAB     ();
+void           PB_CptrsmlaAB   ();
 void           PB_CptrsmAB0    ();
 void           PB_CptrsmAB1    ();
 void           PB_CptrsmB      ();
+void           PB_CptrsmlaB    ();
 
 #endif
                                                              /* TOOLS */
@@ -1819,6 +1865,12 @@ void           PB_CInV         ( PBTYP_T *, char *,    char *,
                                  int,       char *,    int,
                                  int,       int *,     char *,
                                  char * *,  int *,     int * );
+void           PB_CInVla       ( PBTYP_T *, char *,    char *,
+                                 int,       int,       int *,
+                                 int,       char *,    int,
+                                 int,       int *,     char *,
+                                 char * *,  int *,     int * ,
+                                 pd_panel * panel,    char * );
 void           PB_CInV2        ( PBTYP_T *, char *,    char *,
                                  int,       int,       int *,
                                  int,       char *,    int,
@@ -1910,6 +1962,7 @@ void           PB_Cplasca2     ();
 void           PB_Cplacnjg     ();
 
 void           PB_CInV         ();
+void           PB_CInVla       ();
 void           PB_CInV2        ();
 void           PB_CInOutV      ();
 void           PB_CInOutV2     ();

@@ -50,7 +50,7 @@ set (PCBLAS3  pcgeadd_.c pcgemm_.c pchemm_.c  pcher2k_.c pcherk_.c  pcsymm_.c
           pctrsm_.c)
 
 set (PDBLAS3  pdgeadd_.c pdgemm_.c pdsymm_.c  pdsyr2k_.c pdsyrk_.c  pdtradd_.c 
-          pdtran_.c  pdtrmm_.c pdtrsm_.c)
+          pdtran_.c  pdtrmm_.c pdtrsm_.c pdtrsmla_.c pdgemmla_.c)
 
 set (PZBLAS3  pzgeadd_.c pzgemm_.c pzhemm_.c  pzher2k_.c pzherk_.c  pzsymm_.c  
           pzsyr2k_.c pzsyrk_.c pztradd_.c pztranc_.c pztranu_.c pztrmm_.c  
@@ -58,10 +58,19 @@ set (PZBLAS3  pzgeadd_.c pzgemm_.c pzhemm_.c  pzher2k_.c pzherk_.c  pzsymm_.c
 
 #---------------------------------------------------------------------------
 
+#---------------------------------------------------------------------------
+#  Look-Ahead
+#---------------------------------------------------------------------------
+
+set (PDLAHEAD  pdpanel_bcsiz_.c pdpanel_bcast_.c)
+
+#---------------------------------------------------------------------------
+
 set (pblas 
       ${PIBLAS1}
       ${PSBLAS1} ${PCBLAS1} ${PDBLAS1} ${PZBLAS1}
       ${PSBLAS2} ${PCBLAS2} ${PDBLAS2} ${PZBLAS2}
-      ${PSBLAS3} ${PCBLAS3} ${PDBLAS3} ${PZBLAS3})
+      ${PSBLAS3} ${PCBLAS3} ${PDBLAS3} ${PZBLAS3}
+      ${PDLAHEAD})
 
 set (pblas-F ${APPBLAS} )

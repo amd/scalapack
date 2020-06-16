@@ -145,6 +145,7 @@
 
 #define    psgemm_             PSGEMM
 #define    pdgemm_             PDGEMM
+#define    pdgemmla_           PDGEMMLA
 #define    pcgemm_             PCGEMM
 #define    pzgemm_             PZGEMM
 
@@ -167,6 +168,7 @@
 
 #define    pstrsm_             PSTRSM
 #define    pdtrsm_             PDTRSM
+#define    pdtrsmla_           PDTRSMLA
 #define    pctrsm_             PCTRSM
 #define    pztrsm_             PZTRSM
 
@@ -195,6 +197,9 @@
 #define    pztranu_            PZTRANU
 #define    pctranc_            PCTRANC
 #define    pztranc_            PZTRANC
+                                                            /* LOOK AHEAD ROUTINES */
+#define    pdpanel_bcsiz_      PDPANEL_BCSIZ
+#define    pdpanel_bcast_      PDPANEL_BCAST
 
 #endif
 
@@ -315,6 +320,7 @@
 
 #define    psgemm_             psgemm
 #define    pdgemm_             pdgemm
+#define    pdgemmla_           pdgemmla
 #define    pcgemm_             pcgemm
 #define    pzgemm_             pzgemm
 
@@ -331,6 +337,7 @@
 #define    pztrmm_             pztrmm
 
 #define    pstrsm_             pstrsm
+#define    pdtrsmla_           pdtrsmla
 #define    pdtrsm_             pdtrsm
 #define    pctrsm_             pctrsm
 #define    pztrsm_             pztrsm
@@ -361,6 +368,9 @@
 #define    pctranc_            pctranc
 #define    pztranc_            pztranc
 
+#define    pdpanel_bcsiz_      PDPANEL_BCSIZ
+#define    pdpanel_bcast_      PDPANEL_BCAST
+
 #endif
 
 #if( _F2C_CALL_ == _F2C_F77ISF2C )
@@ -370,6 +380,46 @@
 #define    PB_topset_          pb_topset__
 
 #endif
+
+/*
+*  ---------------------------------------------------------------------
+*  Structure definitions
+*  ---------------------------------------------------------------------
+*/
+
+#ifdef __STDC__
+
+typedef struct pd_panel
+{
+   int TM;   /* trsm data row size */ 
+   int TN;   /* trsm data column size */
+   int GM;   /* gemm data row size */
+   int GN;   /* gemm data column size */
+   int lda;  /* Leading dimention detail */
+
+   int brows;
+   int bcols;
+   int fsend;
+   int iacol;
+   int myrow;
+   int fcast;
+   int ictxt;
+
+   int Xii;
+   int Xjj;
+   int ldm;
+
+   int psize;
+   double *pmem;
+
+}pd_panel;
+
+#else
+
+typedef struct pd_panel;
+
+#endif
+
 /*
 *  ---------------------------------------------------------------------
 *  Function prototypes
@@ -816,6 +866,14 @@ void           pdgemm_         ( F_CHAR_T,  F_CHAR_T,  int *,
                                  int *,     int *,     double *,
                                  double *,  int *,     int *,
                                  int * );
+void           pdgemmla_       ( F_CHAR_T,  F_CHAR_T,  int *,
+                                 int *,     int *,     double *,
+                                 double *,  int *,     int *,
+                                 int *,     double *,  int *,
+                                 int *,     int *,     double *,
+                                 double *,  int *,     int *,
+                                 int *,     pd_panel *,
+                                 double * );
 void           pcgemm_         ( F_CHAR_T,  F_CHAR_T,  int *,
                                  int *,     int *,     float *,
                                  float *,   int *,     int *,
@@ -1013,6 +1071,12 @@ void           pdtrsm_         ( F_CHAR_T,  F_CHAR_T,  F_CHAR_T,
                                  double *,  double *,  int *,
                                  int *,     int *,     double *,
                                  int *,     int *,     int * );
+void           pdtrsmla_       ( F_CHAR_T,  F_CHAR_T,  F_CHAR_T,
+                                 F_CHAR_T,  int *,     int *,
+                                 double *,  double *,  int *,
+                                 int *,     int *,     double *,
+                                 int *,  int *,   int *,  
+				                 pd_panel *, double * );
 void           pctrsm_         ( F_CHAR_T,  F_CHAR_T,  F_CHAR_T,
                                  F_CHAR_T,  int *,     int *,
                                  float *,   float *,   int *,
@@ -1023,6 +1087,11 @@ void           pztrsm_         ( F_CHAR_T,  F_CHAR_T,  F_CHAR_T,
                                  double *,  double *,  int *,
                                  int *,     int *,     double *,
                                  int *,     int *,     int * );
+void           pdpanel_bcsiz_  ( double *,  int *,     int *,
+                                 int *,     int *,     int *,
+                                 int *,     int *,     int *,
+                                 pd_panel * );
+void           pdpanel_bcast_  ( double *,  pd_panel * );
 #else
 
 void           PB_freebuf_     ();
@@ -1133,6 +1202,7 @@ void           pzgeadd_        ();
 
 void           psgemm_         ();
 void           pdgemm_         ();
+void           pdgemmla_       ();
 void           pcgemm_         ();
 void           pzgemm_         ();
 
@@ -1176,7 +1246,10 @@ void           pztrmm_         ();
 
 void           pstrsm_         ();
 void           pdtrsm_         ();
+void           pdtrsmla_       ();
 void           pctrsm_         ();
 void           pztrsm_         ();
 
+void           pdpanel_bcsiz_  ();
+void           pdpanel_bcast_  ();
 #endif

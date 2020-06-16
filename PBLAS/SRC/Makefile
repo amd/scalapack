@@ -103,7 +103,7 @@ PCBLAS3 = pcgeadd_.o pcgemm_.o pchemm_.o  pcher2k_.o pcherk_.o  pcsymm_.o  \
           pctrsm_.o
 
 PDBLAS3 = pdgeadd_.o pdgemm_.o pdsymm_.o  pdsyr2k_.o pdsyrk_.o  pdtradd_.o \
-          pdtran_.o  pdtrmm_.o pdtrsm_.o
+          pdtran_.o  pdtrmm_.o pdtrsm_.o  pdtrsmla_.o  pdgemmla_.o
 
 PZBLAS3 = pzgeadd_.o pzgemm_.o pzhemm_.o  pzher2k_.o pzherk_.o  pzsymm_.o  \
           pzsyr2k_.o pzsyrk_.o pztradd_.o pztranc_.o pztranu_.o pztrmm_.o  \
@@ -111,10 +111,18 @@ PZBLAS3 = pzgeadd_.o pzgemm_.o pzhemm_.o  pzher2k_.o pzherk_.o  pzsymm_.o  \
 
 #---------------------------------------------------------------------------
 
+#---------------------------------------------------------------------------
+#  Look-Ahead
+#---------------------------------------------------------------------------
+
+PDLAHEAD = pdpanel_bcsiz_.o pdpanel_bcast_.o pdgemmla_.o
+
+#---------------------------------------------------------------------------
+
 PIBLAS = $(PIBLAS1) $(APPBLAS)
 PSBLAS = $(PSBLAS1) $(PSBLAS2) $(PSBLAS3) $(APPBLAS)
 PCBLAS = $(PCBLAS1) $(PCBLAS2) $(PCBLAS3) $(APPBLAS)
-PDBLAS = $(PDBLAS1) $(PDBLAS2) $(PDBLAS3) $(APPBLAS)
+PDBLAS = $(PDBLAS1) $(PDBLAS2) $(PDBLAS3) $(APPBLAS) $(PDLAHEAD)
 PZBLAS = $(PZBLAS1) $(PZBLAS2) $(PZBLAS3) $(APPBLAS)
 
 integer: $(PIBLAS)

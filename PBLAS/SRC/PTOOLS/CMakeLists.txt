@@ -10,6 +10,7 @@ set( ALLCTOOLS
     PB_CpswapND.c    PB_Cpdot11.c     PB_CpdotNN.c     PB_CpdotND.c     
     PB_CpaxpbyNN.c   PB_CpaxpbyND.c   PB_CpaxpbyDN.c   PB_Cpaxpby.c     
     PB_CpgemmBC.c    PB_CpgemmAC.c    PB_CpgemmAB.c    PB_Cplaprnt.c    
+    PB_CpgemmlaBC.c  PB_CpgemmlaAB.c  PB_CpgemmlaAC.c
     PB_Cplapad.c     PB_Cplapd2.c     PB_Cplascal.c    PB_Cplasca2.c    
     PB_Cplacnjg.c    PB_Cpsym.c       PB_CpsymmAB.c    PB_CpsymmBC.c    
     PB_Cpsyr.c       PB_CpsyrkA.c     PB_CpsyrkAC.c    PB_Cpsyr2.c      
@@ -23,7 +24,8 @@ set( ALLCTOOLS
     PB_Ctzsyr2.c     PB_Ctzsyr2k.c    PB_Ctztrmm.c     PB_Ctztrmv.c     
     PB_Cwarn.c       PB_freebuf_.c    PB_topget_.c     PB_topset_.c     
     PB_Cdescset.c    PB_Cdescribe.c   PB_CargFtoC.c    PB_Cfirstnb.c    
-    PB_Clastnb.c     PB_Cspan.c)
+    PB_Clastnb.c     PB_Cspan.c       PB_CptrsmlaB.c  PB_CptrsmlaAB.c
+    PB_CInVla.c )
 
 set( SCTOOLS PB_Cstypeset.c)
 

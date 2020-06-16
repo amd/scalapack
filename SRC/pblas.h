@@ -615,6 +615,7 @@ typedef char *          F_CHAR;
 #define pctranc_          PCTRANC
 
 #define pdgemm_           PDGEMM
+#define pdgemmla          PDGEMMLA
 #define pdsymm_           PDSYMM
 #define pdsyr2k_          PDSYR2K
 #define pdsyrk_           PDSYRK
@@ -641,6 +642,9 @@ typedef char *          F_CHAR;
 #define pztrsm_           PZTRSM
 #define pztranu_          PZTRANU
 #define pztranc_          PZTRANC
+                                                            /* LOOK AHEAD ROUTINES */
+#define pdpanel_bcsiz_    PDPANEL_BCSIZ
+#define pdpanel_bcast_    PDPANEL_BCAST
 
 #endif
 
@@ -1054,6 +1058,7 @@ typedef char *          F_CHAR;
 #define pctranc_          pctranc
 
 #define pdgemm_           pdgemm
+#define pdgemmla_         pdgemmla
 #define pdsymm_           pdsymm
 #define pdsyr2k_          pdsyr2k
 #define pdsyrk_           pdsyrk
@@ -1080,6 +1085,9 @@ typedef char *          F_CHAR;
 #define pztrsm_           pztrsm
 #define pztranu_          pztranu
 #define pztranc_          pztranc
+                                                            /* LOOK AHEAD ROUTINES */
+#define pdpanel_bcsiz_    pdpanel_bcsiz
+#define pdpanel_bcast_    pdpanel_bcast
 
 #endif
 
