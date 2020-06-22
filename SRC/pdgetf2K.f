@@ -145,7 +145,7 @@
 *     .. Local Scalars ..
       CHARACTER          ROWBTOP
       INTEGER            I, IACOL, IAROW, ICOFF, ICTXT, IIA, IROFF, J,
-     $                   JJA, MN, MYCOL, MYROW, NPCOL, NPROW
+     $                   JJA, MN, MYCOL, MYROW, NPCOL, NPROW, PI
       DOUBLE PRECISION   GMAX
 *     ..
 *     .. External Subroutines ..
@@ -201,20 +201,21 @@
      $              IAROW, IACOL )
       CALL PB_TOPGET( ICTXT, 'Broadcast', 'Rowwise', ROWBTOP )
 *
+      PI = 1
       IF( MYCOL.EQ.IACOL ) THEN
          DO 10 J = JA, JA+MN-1
             I = IA + J - JA
 *
 *           Find pivot and test for singularity.
 *
-            CALL PDAMAX( M-J+JA, GMAX, IPIV( IIA+J-JA ), A, I, J,
+            CALL PDAMAX( M-J+JA, GMAX, IPIV( PI ), A, I, J,
      $                   DESCA, 1 )
             IF( GMAX.NE.ZERO ) THEN
 *
 *              Apply the row interchanges to columns JA:JA+N-1
 *
                CALL PDSWAP( N, A, I, JA, DESCA, DESCA( M_ ), A,
-     $                      IPIV( IIA+J-JA ), JA, DESCA, DESCA( M_ ) )
+     $                      IPIV( PI ), JA, DESCA, DESCA( M_ ) )
 *
 *              Compute elements I+1:IA+M-1 of J-th column.
 *
@@ -232,12 +233,13 @@
      $                     1, A, I, J+1, DESCA, DESCA( M_ ), A, I+1,
      $                     J+1, DESCA ) 
             END IF
+            PI = PI + 1
    10    CONTINUE
 *
       END IF
 *
       RETURN
 *
-*     End of PDGETFK2K
+*     End of PDGETF2K
 *
       END

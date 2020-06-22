@@ -26,7 +26,7 @@ void pdgemmla_( F_CHAR_T TRANSA, F_CHAR_T TRANSB,
                 pd_panel * panel, double * PMEM )
 #else
 void pdgemmla_( TRANSA, TRANSB, M, N, K, ALPHA, A, IA, JA, DESCA,
-              B, IB, JB, DESCB, BETA, C, IC, JC, DESCC, panel, PMEM )
+                B, IB, JB, DESCB, BETA, C, IC, JC, DESCC, panel, PMEM )
 /*
 *  .. Scalar Arguments ..
 */
@@ -425,6 +425,8 @@ void pdgemmla_( TRANSA, TRANSB, M, N, K, ALPHA, A, IA, JA, DESCA,
    }
    ChooseAB = ( ( ABest <= ( 1.3 * BCest ) ) && ( ABest <= ( 1.3 * ACest ) ) );
    ChooseBC = ( ( BCest <= ACest           ) && ( ( 1.3 * BCest ) <= ABest ) );
+/* TODO: Remove the forcing done below */
+   ChooseAB = 1;   
 /*
 *  BLACS topologies are enforced iff M, N and K are strictly greater than the
 *  logical block size returned by pilaenv_. Otherwise, it is assumed that the

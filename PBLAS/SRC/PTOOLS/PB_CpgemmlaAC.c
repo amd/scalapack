@@ -24,8 +24,8 @@ void PB_CpgemmlaAC( PBTYP_T * TYPE, char * DIRECA, char * DIRECC,
                     pd_panel * panel, char * PMEM )
 #else
 void PB_CpgemmlaAC( TYPE, DIRECA, DIRECC, TRANSA, TRANSB, M, N, K, ALPHA,
-                  A, IA, JA, DESCA, B, IB, JB, DESCB, BETA, C, IC, JC,
-                  DESCC, panel, PMEM )
+                    A, IA, JA, DESCA, B, IB, JB, DESCB, BETA, C, IC, JC,
+                    DESCC, panel, PMEM )
 /*
 *  .. Scalar Arguments ..
 */

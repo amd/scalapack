@@ -409,6 +409,11 @@ typedef struct pd_panel
    int Xjj;
    int ldm;
 
+   int SN;  /* Swap row length */
+   int K1;  /* Swap starting row */
+   int K2;  /* Swap ending row */
+   int JB;
+
    int psize;
    double *pmem;
 

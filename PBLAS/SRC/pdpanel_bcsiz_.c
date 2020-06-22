@@ -164,6 +164,11 @@ void pdpanel_bcsiz_(double * A, int * M, int * N,
      panel->Xii = Xii;
      panel->Xjj = Xjj;
      panel->ldm = lda;
+
+     panel->SN = MIN(*M - *JJ + *JA, *JB);
+     panel->K1 = *II;
+     panel->K2 = *JJ;
+     panel->JB = *JB;
    }
 
    return;

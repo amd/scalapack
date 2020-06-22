@@ -1504,7 +1504,7 @@ void           PB_CptrsmlaAB  ( PBTYP_T *, char *,    char *,
                                  char *,    int,       int,
                                  int *,     char *,    int,
                                  int,       int *,     
-				 pd_panel * panel,     char * );
+                                 pd_panel * panel,     char * );
 void           PB_CptrsmAB0    ( PBTYP_T *, char *,    char *,
                                  char *,    int,       int,
                                  char *,    char *,    int,
@@ -1529,7 +1529,7 @@ void           PB_CptrsmlaB   ( PBTYP_T *, char *,    char *,
                                  char *,    int,       int,
                                  int *,     char *,    int,
                                  int,       int *,     
-				 pd_panel  * panel,     char *);
+                                 pd_panel  * panel,    char *);
 #else
 
 F_VOID_FCT     immadd_         ();

@@ -17,13 +17,13 @@
 
 #ifdef __STDC__
 void PB_CptrsmlaB( PBTYP_T * TYPE, char * DIRECB, char * SIDE,
-                 char * UPLO, char * TRANSA, char * DIAG, int M, int N,
-                 char * ALPHA, char * A, int IA, int JA, int * DESCA,
-                 char * B, int IB, int JB, int * DESCB,
-		 pd_panel * PANEL, char * PMEM )
+                   char * UPLO, char * TRANSA, char * DIAG, int M, int N,
+                   char * ALPHA, char * A, int IA, int JA, int * DESCA,
+                   char * B, int IB, int JB, int * DESCB,
+                   pd_panel * PANEL, char * PMEM )
 #else
 void PB_CptrsmlaB( TYPE, DIRECB, SIDE, UPLO, TRANSA, DIAG, M, N, ALPHA, A,
-                 IA, JA, DESCA, B, IB, JB, DESCB, PANEL, PMEM )
+                   IA, JA, DESCA, B, IB, JB, DESCB, PANEL, PMEM )
 /*
 *  .. Scalar Arguments ..
 */

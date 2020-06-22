@@ -24,8 +24,8 @@ void PB_CpgemmlaBC( PBTYP_T * TYPE, char * DIRECB, char * DIRECC,
                     pd_panel * panel, char * PMEM )
 #else
 void PB_CpgemmlaBC( TYPE, DIRECB, DIRECC, TRANSA, TRANSB, M, N, K, ALPHA,
-                  A, IA, JA, DESCA, B, IB, JB, DESCB, BETA, C, IC, JC,
-                  DESCC, panel, PMEM )
+                    A, IA, JA, DESCA, B, IB, JB, DESCB, BETA, C, IC, JC,
+                    DESCC, panel, PMEM )
 /*
 *  .. Scalar Arguments ..
 */

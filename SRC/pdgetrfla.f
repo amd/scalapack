@@ -151,7 +151,8 @@
 *     ..
 *     .. Local Arrays ..
       INTEGER            IDUM1( 1 ), IDUM2( 1 )
-      INTEGER            LC, NS, IAROW, IACOL, LACOL
+      INTEGER            LC1, LC2, NS, IAROW, IACOL, LACOL, JO, FSWAP
+      INTEGER            II, JJ, LB, PIDX( 2 )
 *
 *     Panel Structure definition
 *
@@ -159,18 +160,19 @@
            INTEGER   ::   TM, TN, GM, GN, LDA
            INTEGER   ::   BROWS, BCOLS, FSEND, IACOL, MYROW
            INTEGER   ::   FCAST, ICTXT, XII, XJJ, LDM
+           INTEGER   ::   SN, K1, K2, KB
            INTEGER   ::   PMEMSIZ
            DOUBLE PRECISION, allocatable :: PMEM (:)
       END TYPE PD_PANEL
 *
       TYPE(PD_PANEL) :: PANEL(2)
-
+      INTEGER, allocatable :: TPIV (:)
 *     ..
 *     .. External Subroutines ..
       EXTERNAL           BLACS_GRIDINFO, CHK1MAT, IGAMN2D, PCHK1MAT,
      $                   PB_TOPGET, PB_TOPSET, PDGEMM, PDGETF2,
      $                   PDLASWP, PDTRSM, PXERBLA, PDUPDATE
-     $                   PDGETF2_COMM, PDGETF2K
+     $                   PDGETF2_COMM, PDGETF2K, ICOPYPV
 *     ..
 *     .. External Functions ..
       INTEGER            ICEIL
@@ -188,7 +190,12 @@
 *
       CALL INFOG2L( IA, JA, DESCA, NPROW, NPCOL, MYROW, MYCOL, I, J,
      $              IAROW, IACOL )
-      LC = 1
+
+      LC1 = 1
+      LC2 = 2
+      PIDX(1) = 2
+      PIDX(2) = 1
+      
       LACOL = MOD( IACOL+1, NPCOL ) 
 *
 *     Test the input parameters
@@ -243,84 +250,149 @@
       JN = MIN( ICEIL( JA, DESCA( NB_ ) )*DESCA( NB_ ), JA+MN-1 )
       JB = JN - JA + 1
 
-*      WRITE(*,*) 'Process Co-ordinates:', MYROW, MYCOL
+*     WRITE(*,*) 'Process Co-ordinates:', MYROW, MYCOL
+
+      allocate(TPIV(JB))
 *
 *     Factor diagonal and subdiagonal blocks and test for exact
 *     singularity.
 *
-      CALL PDGETF2K( M, JB, A, IA, JA, DESCA, IPIV, INFO )
+      JJ = JN+1
+      KB = MIN( MN-JJ+JA, DESCA( NB_ ) )
+      II =  IA + JJ - JA
+
+      CALL PDGETF2K( M, JB, A, IA, JA, DESCA, TPIV, INFO )
 *
       IF( JB+1.LE.N ) THEN
 *
 *        Calculate Panel Data Size (TRSM + GEMM Inputs)
 *
          CALL PDPANEL_BCSIZ( A, M, N, IA, JA, IA, JA, JB, DESCA,
-     $                       PANEL(LC) )
-
+     $                       PANEL(LC1) )
 *
 *        Allocate Panel and broadcast
 *
-         allocate(PANEL(LC)%PMEM(PANEL(LC)%PMEMSIZ))
-         CALL PDPANEL_BCAST( A, PANEL(LC) )
+         allocate(PANEL(LC1)%PMEM(PANEL(LC1)%PMEMSIZ))
+         CALL ICOPYPV( M, JB, A, IA, JA, DESCA, TPIV, IPIV, INFO )
+         CALL PDPANEL_BCAST( A, PANEL(LC1) )
          CALL PDGETF2_COMM( M, JB, A, IA, JA, DESCA, IPIV, INFO )
 *
 *        Update trailing matrix
 *
-         NU = MIN(JA+2*JB-1, N)
-         CALL PDUPDATE( M, NU, IA, JA, 0, JB, IA, JA, A, DESCA,
-     $                  IPIV, PANEL(LC), 1, INFO )
-
-         IF( N.GT.NU ) THEN
-            CALL PDUPDATE( M, N, IA, JA, JB, JB, IA, JA, A, DESCA, IPIV,
-     $                     PANEL(LC), 0, INFO )
+*        WRITE(*, *) MYROW, MYCOL
+         IF( MYCOL.EQ.LACOL ) THEN
+            JO = JB
+            FSWAP = 0
+            NU = MIN(JA+2*JB-1, N)
+*
+*           Update small trailing matrix
+*
+            CALL PDUPDATE( M, NU, IA, JA, 0, JB, IA, JA, A, DESCA, TPIV,
+     $                     IPIV, PANEL(LC1), PANEL(LC2), 1, 0, INFO )
+*
+*           Look Ahead Panel Factorization
+*
+            CALL PDGETF2K( M-JJ+JA, KB, A, II, JJ, DESCA, TPIV, IINFO )
+            IF( INFO.EQ.0 .AND. IINFO.GT.0 )
+     $          INFO = IINFO + JJ - JA
+         ELSE
+            NU = 0
+            JO = 0
+            FSWAP = 1
          END IF
+
+*        IF( N.GT.NU ) THEN
+*
+*           Look Ahead Panel Broadcast Init and allocate
+*
+            CALL PDPANEL_BCSIZ( A, M, N, IA, JA, II, JJ, KB, DESCA,
+     $                          PANEL(LC2) )
+            allocate(PANEL(LC2)%PMEM(PANEL(LC2)%PMEMSIZ))
+*
+*           Update remaining large trailing matrix
+*           and broadcast Look Ahead panel
+*
+            CALL PDUPDATE( M, N, IA, JA, JO, JB, IA, JA, A, DESCA, TPIV,
+     $                     IPIV, PANEL(LC1), PANEL(LC2), FSWAP, 1,
+     $                     INFO )
+*        END IF
 *
 *        De-allocate Panel
 *
-         deallocate(PANEL(LC)%PMEM)
+         deallocate(PANEL(LC1)%PMEM)
       END IF
+
+      LC1 = LC2
+      LC2 = PIDX(LC2) 
 *
 *     Loop over the remaining blocks of columns.
 *
-      DO 10 J = JN+1, JA+MN-1, DESCA( NB_ )
+      DO 10 J = JN+1, JA+MN-1-JB, DESCA( NB_ )
          JB = MIN( MN-J+JA, DESCA( NB_ ) )
          I = IA + J - JA
-*
-*        Factor diagonal and subdiagonal blocks and test for exact
-*        singularity.
-*
-         CALL PDGETF2K( M-J+JA, JB, A, I, J, DESCA, IPIV, IINFO )
-*
-         IF( INFO.EQ.0 .AND. IINFO.GT.0 )
-     $      INFO = IINFO + J - JA
-*
-*        Calculate Panel Data Size (TRSM + GEMM Inputs)
-*
-         CALL PDPANEL_BCSIZ( A, M, N, IA, JA, I, J, JB, DESCA,
-     $                       PANEL(LC) )
-*
-*        Allocate Panel and broadcast
-*
-         allocate(PANEL(LC)%PMEM(PANEL(LC)%PMEMSIZ))
-         CALL PDPANEL_BCAST( A, PANEL(LC) )
-         CALL PDGETF2_COMM( M-J+JA, JB, A, I, J, DESCA, IPIV, IINFO )
+
+         JJ = J + DESCA( NB_ )
+         II = IA + JJ - JA
+         KB = MIN( MN-JJ+JA, DESCA( NB_ ) )
+         LACOL = MOD( LACOL+1, NPCOL ) 
 *
 *        Update trailing matrix
 *
-         NU = MIN(J+2*JB-1, N)
-         CALL PDUPDATE( M, NU, I, J, 0, JB, IA, JA, A, DESCA, IPIV,
-     $                  PANEL(LC), 1, INFO )
-         IF( N.GT.NU ) THEN
-            CALL PDUPDATE( M, N, I, J, JB, JB, IA, JA, A, DESCA, IPIV,
-     $                     PANEL(LC), 0, INFO )
+*        WRITE(*, *) MYROW, MYCOL
+         IF( MYCOL.EQ.LACOL ) THEN
+            JO = KB
+            FSWAP = 0
+            NU = MIN(J+2*JB-1, N)
+*
+*           Update small trailing matrix
+*
+            CALL PDUPDATE( M, NU, I, J, 0, JB, IA, JA, A, DESCA, TPIV,
+     $                     IPIV, PANEL(LC1), PANEL(LC2), 1, 0, INFO )
+*
+*           Look Ahead Panel Factorization
+*
+            CALL PDGETF2K( M-JJ+JA, KB, A, II, JJ, DESCA, TPIV, IINFO )
+            IF( INFO.EQ.0 .AND. IINFO.GT.0 )
+     $          INFO = IINFO + JJ - JA
+         ELSE
+            NU = 0
+            JO = 0
+            FSWAP = 1
          END IF
+*        IF( N.GT.NU ) THEN
+*
+*           Look Ahead Panel Broadcast Init and allocate
+*
+            CALL PDPANEL_BCSIZ( A, M, N, IA, JA, II, JJ, KB, DESCA,
+     $                          PANEL(LC2) )
+            allocate(PANEL(LC2)%PMEM(PANEL(LC2)%PMEMSIZ))
+*
+*           Update remaining large trailing matrix
+*           and broadcast Look Ahead panel
+*
+            CALL PDUPDATE( M, N, I, J, JO, JB, IA, JA, A, DESCA, TPIV,
+     $                     IPIV, PANEL(LC1), PANEL(LC2), FSWAP, 1,
+     $                     INFO )
+*        END IF
 *
 *        De-allocate Panel
 *
-         deallocate(PANEL(LC)%PMEM)
+         deallocate(PANEL(LC1)%PMEM)
+         LC1 = LC2
+         LC2 = PIDX(LC2) 
 *
    10 CONTINUE
 *
+*     CALL ICOPYPV( M-JJ+JA, KB, A, II, JJ, DESCA, TPIV, IPIV, INFO )
+*     CALL PDGETF2_COMM( M-JJ+JA, KB, A, II, JJ, DESCA, IPIV, INFO )
+      CALL PDUPDATE( M, N, II, JJ, 0, KB, IA, JA, A, DESCA, TPIV, IPIV,
+     $               PANEL(LC1), PANEL(LC2), 1, 0, INFO )
+
+*     IF( N.GT.NU ) THEN
+         deallocate(PANEL(LC1)%PMEM)
+*     END IF
+      deallocate(TPIV)
+
       IF( INFO.EQ.0 )
      $   INFO = MN + 1
       CALL IGAMN2D( ICTXT, 'Rowwise', ' ', 1, 1, INFO, 1, IDUM1, IDUM2,

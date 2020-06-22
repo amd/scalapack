@@ -24,8 +24,8 @@ void PB_CpgemmlaAB( PBTYP_T * TYPE, char * DIRECA, char * DIRECB,
                     pd_panel * panel, char * PMEM )
 #else
 void PB_CpgemmlaAB( TYPE, DIRECA, DIRECB, TRANSA, TRANSB, M, N, K, ALPHA,
-                  A, IA, JA, DESCA, B, IB, JB, DESCB, BETA, C, IC, JC,
-                  DESCC, panel, PMEM )
+                    A, IA, JA, DESCA, B, IB, JB, DESCB, BETA, C, IC, JC,
+                    DESCC, panel, PMEM )
 /*
 *  .. Scalar Arguments ..
 */
@@ -343,7 +343,7 @@ void PB_CpgemmlaAB( TYPE, DIRECA, DIRECB, TRANSA, TRANSB, M, N, K, ALPHA,
       int Xii, Xjj, Xrow, Xcol, Xld;
       char *WT;
 
-      WAfr = NULL;
+      WAfr = 0;
       Minfog2l( IA, JA, DESCA, nprow, npcol, myrow, mycol, Xii, Xjj, Xrow, Xcol );
 
       if(Xcol == mycol)
@@ -356,7 +356,6 @@ void PB_CpgemmlaAB( TYPE, DIRECA, DIRECB, TRANSA, TRANSB, M, N, K, ALPHA,
         Xld = panel->lda;
         WA = PMEM + panel->TM * sizeof(double);
       }
-
       PB_CInV( TYPE, &TrB, ROW, M, N, Cd0, K, B, IB, JB, DESCB, &Broc, &WB,
                WBd0, &WBfr );
 

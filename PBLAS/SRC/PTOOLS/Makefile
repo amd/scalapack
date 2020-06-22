@@ -77,8 +77,8 @@ ALLCTOOLS = \
     PB_Ctzsyr2.o     PB_Ctzsyr2k.o    PB_Ctztrmm.o     PB_Ctztrmv.o     \
     PB_Cwarn.o       PB_freebuf_.o    PB_topget_.o     PB_topset_.o     \
     PB_Cdescset.o    PB_Cdescribe.o   PB_CargFtoC.o    PB_Cfirstnb.o    \
-    PB_Clastnb.o     PB_Cspan.o       PB_CptrsmlaB.o  PB_CptrsmlaAB.o   \
-	PB_CInVla.o
+    PB_Clastnb.o     PB_Cspan.o       PB_CptrsmlaB.o   PB_CptrsmlaAB.o  \
+		PB_CInVla.o
 
 #---------------------------------------------------------------------------
 

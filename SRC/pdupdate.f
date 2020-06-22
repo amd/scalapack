@@ -1,15 +1,15 @@
 *  =====================================================================
 *     SUBROUTINE PDUPDATE
 *  =====================================================================
-      SUBROUTINE PDUPDATE( M, N, I, J, JO, JB, IA, JA, A, DESCA, 
-     $                    IPIV, PANEL, DS, INFO)
+      SUBROUTINE PDUPDATE( M, N, I, J, JO, JB, IA, JA, A, DESCA, TPIV, 
+     $                    IPIV, PANEL, BPANEL, DS, BCAST, INFO)
 *
 *  -- ScaLAPACK routine (version 2.1.0) --
 *     Copyright (c) 2020 Advanced Micro Devices, Inc.  All rights reserved.
 *     June 10, 2020
 *
 *     .. Scalar Arguments ..
-      INTEGER         M, N, I, J, JO, JB, JA, IA, DS, INFO
+      INTEGER         M, N, I, J, JO, JB, JA, IA, DS, BCAST, INFO
 *     ..
 *     .. Array Arguments ..
       DOUBLE PRECISION   A( * )
@@ -19,26 +19,29 @@
            INTEGER   ::   TM, TN, GM, GN, LDA
            INTEGER   ::   BROWS, BCOLS, FSEND, IACOL, MYROW
            INTEGER   ::   FCAST, ICTXT, XII, XJJ, LDM
+           INTEGER   ::   SN, K1, K2, KB
            INTEGER   ::   PMEMSIZ
            DOUBLE PRECISION, allocatable :: PMEM (:)
       END TYPE PD_PANEL
 *
       TYPE(PD_PANEL) :: PANEL 
+      TYPE(PD_PANEL) :: BPANEL 
 *
       DOUBLE PRECISION   ONE
       PARAMETER          ( ONE = 1.0D+0 )
 *     ..
 *     .. External Subroutines ..
       EXTERNAL     PDLASWP, PDTRSM, PDGEMM, PDGEMMLA, PXERBLA
-     $              BLACS_ABORT, BLACS_GRIDINFO, CHK1MAT
+     $             BLACS_ABORT, BLACS_GRIDINFO, CHK1MAT,
+     $             ICOPYPV, ICOPY
 *     ..
 *     .. Executable Statements ..
 *
 *     Apply interchanges to columns JA:J-JA.
 *
       IF( J-JA.GT.0 .AND. DS.EQ.1  ) THEN
-         CALL PDLASWP( 'Forward', 'Rowwise', J-JA, A, IA, JA, DESCA,
-     $                 I, I+JB-1, IPIV )
+          CALL PDLASWP( 'Forward', 'Rowwise', J-JA, A, IA, JA, DESCA,
+     $                  I, I+JB-1, IPIV )
       END IF
 *
 *     WRITE(*, *) JO, M-J-JB+JA, N-J-JB+JA-JO, J-JA+JB+1, N
@@ -46,8 +49,8 @@
 *
 *        Apply interchanges to columns J+JB:JA+N-1.
 *
-         CALL PDLASWP( 'Forward', 'Rowwise', N-J-JB+JA-JO, A, IA,
-     $                 J+JB+JO, DESCA, I, I+JB-1, IPIV )
+          CALL PDLASWP( 'Forward', 'Rowwise', N-J-JB+JA-JO, A, IA,
+     $                  J+JB+JO, DESCA, I, I+JB-1, IPIV )
 *
 *        Compute block row of U.
 *
@@ -55,6 +58,14 @@
      $                N-J-JB+JA-JO, ONE, A, I, J, DESCA, A, I, J+JB+JO,
      $                DESCA, PANEL, PANEL%PMEM )
 *
+         IF( BCAST.EQ.1 ) THEN
+            CALL ICOPYPV( BPANEL%SN, BPANEL%KB, A, BPANEL%K1, BPANEL%K2,
+     $                    DESCA, TPIV, IPIV, INFO )
+            CALL PDPANEL_BCAST( A, BPANEL )
+            CALL PDGETF2_COMM( BPANEL%SN, BPANEL%KB, A, BPANEL%K1,
+     $                         BPANEL%K2, DESCA, IPIV, INFO )
+         ENDIF
+           
          IF( J-JA+JB+1.LE.M ) THEN
 *
 *           Update trailing submatrix.

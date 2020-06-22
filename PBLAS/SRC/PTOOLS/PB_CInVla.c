@@ -22,7 +22,7 @@ void PB_CInVla( PBTYP_T * TYPE, char * CONJUG, char * ROWCOL, int M,
               int * XAFREE, pd_panel * panel, char * PMEM )
 #else
 void PB_CInVla( TYPE, CONJUG, ROWCOL, M, N, DESCA, K, X, IX, JX, DESCX,
-              XROC, XAPTR, DXA, XAFREE, panel, PMEM )
+                XROC, XAPTR, DXA, XAFREE, panel, PMEM )
 /*
 *  .. Scalar Arguments ..
 */

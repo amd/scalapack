@@ -23,7 +23,7 @@ void pdtrsmla_( F_CHAR_T SIDE, F_CHAR_T UPLO, F_CHAR_T TRANS, F_CHAR_T DIAG,
                 pd_panel *PANEL, double * PMEM )
 #else
 void pdtrsmla_( SIDE, UPLO, TRANS, DIAG, M, N, ALPHA,
-              A, IA, JA, DESCA, B, IB, JB, DESCB, PANEL, PMEM )
+                A, IA, JA, DESCA, B, IB, JB, DESCB, PANEL, PMEM )
 /*
 *  .. Scalar Arguments ..
 */
@@ -240,9 +240,6 @@ void pdtrsmla_( SIDE, UPLO, TRANS, DIAG, M, N, ALPHA,
 *          The buffer holds global matrix data needed for trsm and gemm
 *          operations for thelookahead.
 *
-*  -- Written on April 1, 1998 by
-*     Antoine Petitet, University of Tennessee, Knoxville 37996, USA.
-*
 *  ---------------------------------------------------------------------
 */
 /*
@@ -426,6 +423,8 @@ void pdtrsmla_( SIDE, UPLO, TRANS, DIAG, M, N, ALPHA,
 */
    Var = CRIGHT;
 
+/* TODO: Remove the forcing done below */
+   ChooseAB = 1;   
    if( ChooseAB )
    {
 /*
