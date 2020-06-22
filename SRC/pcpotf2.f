@@ -243,7 +243,7 @@
                   CALL CDOTC_F2C( TMP, J-JA, A( IOFFA ), 1,
      $                             A( IOFFA ), 1 )
                   AJJ = REAL( A( IDIAG ) ) - TMP
-#else
+#elif F90
                   AJJ = REAL( A( IDIAG ) ) -
      $                  CDOTC( J-JA, A( IOFFA ), 1, A( IOFFA ), 1 )
 #endif
@@ -315,7 +315,7 @@
                   CALL CDOTC_F2C( TMP, J-JA, A( IOFFA ), LDA, 
      $                               A( IOFFA ), LDA )
                   AJJ = REAL( A( IDIAG ) ) - TMP
-#else
+#elif F90
                   AJJ = REAL( A( IDIAG ) ) -
      $                  CDOTC( J-JA, A( IOFFA ), LDA, A( IOFFA ), LDA )
 #endif

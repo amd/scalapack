@@ -128,7 +128,14 @@ MESSAGE(STATUS "=========")
 
 # --------------------------------------------------
 # Compiler Flags
-ADD_DEFINITIONS( "-D${CDEFS}")
+option(USE_F2C "Use FORTRAN To C compatible interface for certain Complex type functions" OFF)
+set(f2cflag "-cpp -DF90")
+
+if(USE_F2C)
+   set(f2cflag "-cpp -DF2C" )
+ENDIF(USE_F2C)
+
+ADD_DEFINITIONS( "-D${CDEFS}" "${f2cflag}")
 
 # --------------------------------------------------
 # ScaLAPACK needs BLAS and LAPACK
@@ -140,7 +147,11 @@ message(STATUS "CHECKING BLAS AND LAPACK LIBRARIES")
 IF(LAPACK_LIBRARIES)
   include(CheckFortranFunctionExists)
   message(STATUS "--> LAPACK supplied by user is ${LAPACK_LIBRARIES}.")
-  set(CMAKE_REQUIRED_LIBRARIES ${LAPACK_LIBRARIES})
+  if(BLAS_LIBRARIES)
+     set(CMAKE_REQUIRED_LIBRARIES ${LAPACK_LIBRARIES};${BLAS_LIBRARIES})
+  else(BLAS_LIBRARIES)
+     set(CMAKE_REQUIRED_LIBRARIES ${LAPACK_LIBRARIES})
+  ENDIF(BLAS_LIBRARIES)
   CHECK_FORTRAN_FUNCTION_EXISTS("dgesv" LAPACK_FOUND)
   unset( CMAKE_REQUIRED_LIBRARIES )
   message(STATUS "--> LAPACK routine dgesv is found: ${LAPACK_FOUND}.")

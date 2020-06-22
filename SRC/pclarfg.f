@@ -162,7 +162,7 @@
 *     ..
 *     .. External Functions ..
       REAL               SLAMCH, SLAPY3
-#ifndef F2C      
+#ifndef F2C
       COMPLEX            CLADIV
 #endif
       EXTERNAL           CLADIV, SLAPY3, SLAMCH
@@ -271,7 +271,7 @@
 
 #ifdef F2C
             CALL CLADIV( ALPHA, CMPLX( ONE ), ALPHA-BETA )
-#else
+#elif F90
             ALPHA = CLADIV( CMPLX( ONE ), ALPHA-BETA )
 #endif
             CALL PCSCAL( N-1, ALPHA, X, IX, JX, DESCX, INCX )
@@ -288,7 +288,7 @@
 
 #ifdef F2C
             CALL CLADIV( ALPHA, CMPLX( ONE ), ALPHA-BETA )
-#else
+#elif F90
             ALPHA = CLADIV( CMPLX( ONE ), ALPHA-BETA )
 #endif
             CALL PCSCAL( N-1, ALPHA, X, IX, JX, DESCX, INCX )
