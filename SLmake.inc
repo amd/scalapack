@@ -29,7 +29,7 @@ FC            = mpif90
 CC            = mpicc 
 NOOPT         = -O0
 
-FCFLAGS       = -cpp -DF2C -DENABLE_LOOK_AHEAD_FOR_LU  -O3
+FCFLAGS       = -cpp -DUSE_BLAS -DF2C -DENABLE_LOOK_AHEAD_FOR_LU  -O3
 # Retain the above line when linking with fortran to C converted  Lapack libraries. Comment the above line and Uncomment the below line when linking with Fortran based Lapack libraries.
 #FCFLAGS       = -cpp  -O3
 
