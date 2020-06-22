@@ -180,7 +180,7 @@
                CALL ZDOTC_F2C(TMP, NA, A( ICURR ), LDA,
      $                               A( ICURR ), LDA )
                A( IDIAG ) = AII*AII + DBLE( TMP )
-#else
+#elif USE_BLAS
                A( IDIAG ) = AII*AII + DBLE( ZDOTC( NA, A( ICURR ), LDA,
      $                                           A( ICURR ), LDA ) )
 #endif
@@ -206,7 +206,7 @@
                CALL  ZDOTC_F2C( TMP, N-NA, A( ICURR ), 1,
      $                             A( ICURR ), 1 ) 
                A( IDIAG ) = AII*AII + DBLE( TMP)
-#else
+#elif USE_BLAS
                A( IDIAG ) = AII*AII + DBLE( ZDOTC( N-NA, A( ICURR ), 1,
      $                                             A( ICURR ), 1 ) )
 #endif

@@ -342,7 +342,7 @@
                     CALL CDOTC_F2C( TMP, J, TAU( JJ ), 1,
      $                               A( II+JK*LDA ), 1 )
                      ALPHA = -HALF*TAUI*TMP
-#else
+#elif USE_BLAS
                      ALPHA = -HALF*TAUI*CDOTC( J, TAU( JJ ), 1,
      $                                         A( II+JK*LDA ), 1 )
 #endif
@@ -429,7 +429,7 @@
      $                          A( IK+1+(JK-1)*LDA ), 1 )
                      ALPHA = -HALF*TAUI*TMP
 
-#else
+#elif USE_BLAS
                      ALPHA = -HALF*TAUI*CDOTC( N-J, TAU( JK ), 1,
      $                        A( IK+1+(JK-1)*LDA ), 1 )
 #endif

@@ -32,7 +32,7 @@
 *
 #ifdef F2C_COMPLEX
       CALL ZDOTC_F2C( DOTC, N, X, INCX, Y, INCY )
-#else
+#elif USE_BLAS
       DOTC = ZDOTC( N, X, INCX, Y, INCY )
 #endif
 *
