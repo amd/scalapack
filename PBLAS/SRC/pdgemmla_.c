@@ -14,6 +14,7 @@
 #include "PBtools.h"
 #include "PBblacs.h"
 #include "PBblas.h"
+#include "../../AOCL_DTL/SRC/aocldtl.h"
 
 #ifdef __STDC__
 void pdgemmla_( F_CHAR_T TRANSA, F_CHAR_T TRANSB,
@@ -245,6 +246,7 @@ void pdgemmla_( TRANSA, TRANSB, M, N, K, ALPHA, A, IA, JA, DESCA,
 *
 *  ---------------------------------------------------------------------
 */
+   AOCL_DTL_TRACE_ENTRY(AOCL_DTL_LEVEL_TRACE_5);
 /*
 *  .. Local Scalars ..
 */
@@ -513,4 +515,5 @@ void pdgemmla_( TRANSA, TRANSB, M, N, K, ALPHA, A, IA, JA, DESCA,
 /*
 *  End of PDGEMMLA
 */
+   AOCL_DTL_TRACE_EXIT(AOCL_DTL_LEVEL_TRACE_5);
 }

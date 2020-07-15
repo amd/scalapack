@@ -48,7 +48,9 @@ include ../SLmake.inc
 #
 #######################################################################
 
-ALLAUX = pjlaenv.o pbchkvect.o getpbbuf.o pilaenvx.o piparmq.o pilaver.o pmpim2.o pmpcol.o
+ALLAUX = pjlaenv.o pbchkvect.o getpbbuf.o pilaenvx.o piparmq.o pilaver.o \
+         pmpim2.o pmpcol.o get_aocl_scalapack_version.o \
+         aocl_dtl_trace_entry.o aocl_dtl_trace_exit.o
 
 SCLAUX = \
    pslabad.o pslaed0.o pslaed1.o pslaed2.o pslaed3.o pslaedz.o pslaiect.o \

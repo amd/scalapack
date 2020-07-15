@@ -135,17 +135,20 @@
 *
 *  =====================================================================
 *
-
-#ifdef ENABLE_LOOK_AHEAD_FOR_LU
 *     ..
 *     .. Local Scalars ..
 
 *     Defining the threshold to invoke look-ahead      
       INTEGER            LU_THRESHOLD
-      PARAMETER         (LU_THRESHOLD = 512)
+      PARAMETER         (LU_THRESHOLD = 0)
 *
+#ifdef AOCL_DTL_ADVANCED_TRACE_ENABLE
+      CALL AOCL_DTL_TRACE_ENTRY(__FILE__, __LINE__, ' ')
+#endif
+
+#ifdef ENABLE_LOOK_AHEAD_FOR_LU
       IF( (M.GT.LU_THRESHOLD).OR.(N.GT.LU_THRESHOLD)) THEN
-         CALL  PDGETRFLA( M, N, A, IA, JA, DESCA, IPIV, INFO )
+         CALL PDGETRFLA( M, N, A, IA, JA, DESCA, IPIV, INFO )
       ELSE
          CALL PDGETRF0( M, N, A, IA, JA, DESCA, IPIV, INFO )
       END IF
@@ -153,6 +156,9 @@
       CALL PDGETRF0( M, N, A, IA, JA, DESCA, IPIV, INFO )
 #endif
 *
+#ifdef AOCL_DTL_ADVANCED_TRACE_ENABLE
+      CALL AOCL_DTL_TRACE_EXIT(__FILE__, __LINE__, ' ')
+#endif
       RETURN
 *
 *     End of PDGETRF

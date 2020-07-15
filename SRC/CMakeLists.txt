@@ -1,5 +1,8 @@
 set (ALLAUX  pjlaenv.f  pilaenvx.f piparmq.f pilaver.f pmpim2.f pmpcol.f)
-set (ALLAUX-C  pbchkvect.c getpbbuf.c pcrot.c pslaiect.c pdlaiect.c pzrot.c slamov.c clamov.c dlamov.c zlamov.c)
+set (ALLAUX-C
+   pbchkvect.c getpbbuf.c pcrot.c pslaiect.c pdlaiect.c pzrot.c
+   slamov.c clamov.c dlamov.c zlamov.c
+   get_aocl_scalapack_version.c aocl_dtl_trace_entry.c aocl_dtl_trace_exit.c)
 
 set (SCLAUX  
    pslabad.f pslaed0.f pslaed1.f pslaed2.f pslaed3.f pslaedz.f 

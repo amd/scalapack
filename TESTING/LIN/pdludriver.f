@@ -113,8 +113,9 @@
       DOUBLE PRECISION   MEM( MEMSIZ ), CTIME( 2 ), WTIME( 2 )
 #else
       DOUBLE PRECISION   CTIME( 2 ), WTIME( 2 )
-	  DOUBLE PRECISION, allocatable :: MEM (:)
+      DOUBLE PRECISION, allocatable :: MEM (:)
 #endif
+      CHARACTER*10       ::  SVERSION
 *     ..
 *     .. External Subroutines ..
       EXTERNAL           BLACS_BARRIER, BLACS_EXIT, BLACS_GET,
@@ -123,7 +124,8 @@
      $                   PDFILLPAD, PDGECON, PDGERFS,
      $                   PDGETRF, PDGETRRV, PDGETRS,
      $                   PDLAFCHK, PDLASCHK, PDLUINFO,
-     $                   PDMATGEN, SLBOOT, SLCOMBINE, SLTIMER
+     $                   PDMATGEN, SLBOOT, SLCOMBINE, SLTIMER,
+     $                   GET_AOCL_SCALAPACK_VERSION
 *     ..
 *     .. External Functions ..
       INTEGER            ICEIL, ILCM, NUMROC
@@ -151,6 +153,11 @@
      $               NTESTS, NGRIDS, PVAL, NTESTS, QVAL, NTESTS, THRESH,
      $               EST, MEM, IAM, NPROCS )
       CHECK = ( THRESH.GE.0.0E+0 )
+*
+*     Print version
+*
+      CALL GET_AOCL_SCALAPACK_VERSION( SVERSION )
+      WRITE(*, *) SVERSION
 *
 *     Print headings
 *

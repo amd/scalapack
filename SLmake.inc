@@ -29,11 +29,25 @@ FC            = mpif90
 CC            = mpicc 
 NOOPT         = -O0
 
-FCFLAGS       = -cpp -DUSE_BLAS -DF2C -O3
-# Retain the above line when linking with fortran to C converted  Lapack libraries. Comment the above line and Uncomment the below line when linking with Fortran based Lapack libraries.
+# Use following macros to enable/disable features
+#   DYNAMIC_WORK_MEM_ALLOC macro to enable testing for higher matrix sizes
+#   AOCL_DTL_AUTO_TRACE_ENABLE to enable automatic function call tracing
+#   AOCL_DTL_ADVANCED_TRACE_ENABLE to enable advanced function call tracing
+
+FTFLAGS       = -DAOCL_DTL_ADVANCED_TRACE_ENABLE 
+
+FCFLAGS       = -cpp -DUSE_BLAS -DF2C -O3 -fopenmp -DDYNAMIC_WORK_MEM_ALLOC
+
+# Retain the above line when linking with fortran to C converted  Lapack libraries.
+# Comment the above line and Uncomment the below line when linking with Fortran based Lapack libraries.
+
 #FCFLAGS       = -cpp  -O3
 
-CCFLAGS       = -O3
+CCFLAGS       = -O3 -fopenmp
+
+FCFLAGS += $(FTFLAGS)
+CCFLAGS += $(FTFLAGS)
+
 FCLOADER      = $(FC)
 CCLOADER      = $(CC)
 FCLOADFLAGS   = $(FCFLAGS)
@@ -63,8 +77,8 @@ SCALAPACKLIB  = libscalapack.a
 
 # AMD optimized Scalapack requires 'Blis' and 'LibFlame' libraries pre-installed.
 # Provide Blis and LibFlame library paths (as below)
-BLASLIB_PATH   :=
-LAPACKLIB_PATH :=
+BLASLIB_PATH   := 
+LAPACKLIB_PATH := 
 
 BLASLIB       = $(BLASLIB_PATH)/libblis.a
 LAPACKLIB     = $(LAPACKLIB_PATH)/libflame.a
