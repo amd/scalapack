@@ -14,7 +14,8 @@ comm = igesd2d_.o sgesd2d_.o dgesd2d_.o cgesd2d_.o zgesd2d_.o \
        itrbr2d_.o strbr2d_.o dtrbr2d_.o ctrbr2d_.o ztrbr2d_.o \
        igsum2d_.o sgsum2d_.o dgsum2d_.o cgsum2d_.o zgsum2d_.o \
        igamx2d_.o sgamx2d_.o dgamx2d_.o cgamx2d_.o zgamx2d_.o \
-       igamn2d_.o sgamn2d_.o dgamn2d_.o cgamn2d_.o zgamn2d_.o
+       igamn2d_.o sgamn2d_.o dgamn2d_.o cgamn2d_.o zgamn2d_.o \
+       ugebx2d_.o
 
 #  --------------------
 #  The support routines
@@ -57,7 +58,7 @@ internal = BI_HypBS.o BI_HypBR.o BI_IdringBS.o BI_IdringBR.o \
            BI_dMPI_amn.o BI_cMPI_amn.o BI_zMPI_amn.o BI_iMPI_amn2.o \
            BI_sMPI_amn2.o BI_dMPI_amn2.o BI_cMPI_amn2.o BI_zMPI_amn2.o \
            BI_cMPI_sum.o BI_zMPI_sum.o BI_ContxtNum.o BI_GlobalVars.o \
-           BI_TransUserComm.o
+           BI_TransUserComm.o AOCLI_IdringSR.o AOCLI_SringSR.o
 
 lib : all
 

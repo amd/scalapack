@@ -115,7 +115,10 @@ PZBLAS3 = pzgeadd_.o pzgemm_.o pzhemm_.o  pzher2k_.o pzherk_.o  pzsymm_.o  \
 #  Look-Ahead
 #---------------------------------------------------------------------------
 
-PDLAHEAD = pdpanel_bcsiz_.o pdpanel_bcast_.o pdgemmla_.o
+PDLAHEAD = pdpanel_lcopy_.o pdpanel_bcsiz_.o pdpanel_bcast_.o  \
+           pdpanel_bfree_.o pdpanel_bpack_.o pdpanel_bwait_.o  \
+           pdpanel_pinit_.o pdpanel_pfree_.o pdpanel_ucast_.o  \
+           pdpanel_lcast_.o pdgemmla_.o
 
 #---------------------------------------------------------------------------
 

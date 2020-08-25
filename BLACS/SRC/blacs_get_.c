@@ -1,3 +1,12 @@
+/* ---------------------------------------------------------------------
+*
+*  -- BLACS routine (version 2.1.0) --
+*     Copyright (c) 2020 Advanced Micro Devices, Inc.  All rights reserved.
+*     August 11, 2020
+*
+*  ---------------------------------------------------------------------
+*/
+
 #include "Bdef.h"
 #if (INTFACE == C_CALL)
 void Cblacs_get(int ConTxt, int what, int *val)
@@ -23,7 +32,7 @@ F_VOID_FUNC blacs_get_(int *ConTxt, int *what, int *val)
       if (BI_COMM_WORLD == NULL) Cblacs_pinfo(val, &val[1]);
       iptr = &val[1];
       ierr=MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_TAG_UB, (BVOID **) &iptr,val);
-      val[0] = 0;
+      val[0] = 3001;
       val[1] = *iptr;
       break;
    case SGET_DEBUGLVL:

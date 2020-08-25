@@ -12,7 +12,8 @@ set (comm
        itrbr2d_.c strbr2d_.c dtrbr2d_.c ctrbr2d_.c ztrbr2d_.c 
        igsum2d_.c sgsum2d_.c dgsum2d_.c cgsum2d_.c zgsum2d_.c 
        igamx2d_.c sgamx2d_.c dgamx2d_.c cgamx2d_.c zgamx2d_.c 
-       igamn2d_.c sgamn2d_.c dgamn2d_.c cgamn2d_.c zgamn2d_.c)
+       igamn2d_.c sgamn2d_.c dgamn2d_.c cgamn2d_.c zgamn2d_.c
+       ugebx2d_.c)
 
 #  --------------------
 #  The support routines
@@ -50,7 +51,7 @@ set (internal
            BI_dMPI_amn.c BI_cMPI_amn.c BI_zMPI_amn.c BI_iMPI_amn2.c
            BI_sMPI_amn2.c BI_dMPI_amn2.c BI_cMPI_amn2.c BI_zMPI_amn2.c
            BI_cMPI_sum.c BI_zMPI_sum.c BI_ContxtNum.c BI_GlobalVars.c
-           BI_TransUserComm.c )
+           BI_TransUserComm.c AOCLI_IdringSR.c AOCLI_SringSR.c)
 
 
 #

@@ -1,3 +1,12 @@
+/* ---------------------------------------------------------------------
+*
+*  -- BLACS routine (version 2.1.0) --
+*     Copyright (c) 2020 Advanced Micro Devices, Inc.  All rights reserved.
+*     August 11, 2020
+*
+*  ---------------------------------------------------------------------
+*/
+
 #include "Bdef.h"
 
 #if (INTFACE == C_CALL)
@@ -27,6 +36,9 @@ F_VOID_FUNC blacs_gridexit_(int *ConTxt)
    MPI_Comm_free(&ctxt->ascp.comm);
    MPI_Comm_free(&ctxt->rscp.comm);
    MPI_Comm_free(&ctxt->cscp.comm);
+#ifdef ENABLE_LOOK_AHEAD_FOR_LU
+   MPI_Comm_free(&ctxt->lscp.comm);
+#endif /* ENABLE_LOOK_AHEAD_FOR_LU */
    free(ctxt);
    BI_MyContxts[Mpval(ConTxt)] = NULL;
 }

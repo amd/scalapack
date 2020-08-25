@@ -62,7 +62,10 @@ set (PZBLAS3  pzgeadd_.c pzgemm_.c pzhemm_.c  pzher2k_.c pzherk_.c  pzsymm_.c
 #  Look-Ahead
 #---------------------------------------------------------------------------
 
-set (PDLAHEAD  pdpanel_bcsiz_.c pdpanel_bcast_.c)
+set (PDLAHEAD  pdpanel_lcopy_.c pdpanel_bcsiz_.c pdpanel_bcast_.c 
+               pdpanel_bwait_.c pdpanel_bfree_.c pdpanel_pinit_.c
+               pdpanel_bpack_.c pdpanel_pfree_.c pdpanel_ucast_.c
+               pdpanel_lcast_.c)
 
 #---------------------------------------------------------------------------
 

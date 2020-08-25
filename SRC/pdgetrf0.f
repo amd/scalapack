@@ -3,7 +3,7 @@
 *  =====================================================================
       SUBROUTINE PDGETRF0( M, N, A, IA, JA, DESCA, IPIV, INFO )
 *
-*  -- ScaLAPACK routine (version 2.1.0) --
+*  -- ScaLAPACK routine --
 *     Copyright (c) 2020 Advanced Micro Devices, Inc.  All rights reserved.
 *     June 10, 2020
 *

@@ -63,7 +63,6 @@ ALLCTOOLS = \
     PB_CpswapND.o    PB_Cpdot11.o     PB_CpdotNN.o     PB_CpdotND.o     \
     PB_CpaxpbyNN.o   PB_CpaxpbyND.o   PB_CpaxpbyDN.o   PB_Cpaxpby.o     \
     PB_CpgemmBC.o    PB_CpgemmAC.o    PB_CpgemmAB.o    PB_Cplaprnt.o    \
-    PB_CpgemmlaBC.o  PB_CpgemmlaAB.o PB_CpgemmlaAC.o \
     PB_Cplapad.o     PB_Cplapd2.o     PB_Cplascal.o    PB_Cplasca2.o    \
     PB_Cplacnjg.o    PB_Cpsym.o       PB_CpsymmAB.o    PB_CpsymmBC.o    \
     PB_Cpsyr.o       PB_CpsyrkA.o     PB_CpsyrkAC.o    PB_Cpsyr2.o      \
@@ -77,9 +76,7 @@ ALLCTOOLS = \
     PB_Ctzsyr2.o     PB_Ctzsyr2k.o    PB_Ctztrmm.o     PB_Ctztrmv.o     \
     PB_Cwarn.o       PB_freebuf_.o    PB_topget_.o     PB_topset_.o     \
     PB_Cdescset.o    PB_Cdescribe.o   PB_CargFtoC.o    PB_Cfirstnb.o    \
-    PB_Clastnb.o     PB_Cspan.o       PB_CptrsmlaB.o   PB_CptrsmlaAB.o  \
-		PB_CInVla.o
-
+    PB_Clastnb.o     PB_Cspan.o
 #---------------------------------------------------------------------------
 
 ALLTOOLS = $(ALLCTOOLS)

@@ -100,6 +100,7 @@ cleanexe:
 	( cd TESTING; rm -f x* )
 
 cleanlib:
+	( cd AOCL_DTL; $(MAKE) clean )
 	( cd BLACS; $(MAKE) clean )
 	( cd PBLAS/SRC; $(MAKE) clean )
 	( cd SRC; $(MAKE) clean )

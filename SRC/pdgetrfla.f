@@ -3,7 +3,7 @@
 *  =====================================================================
       SUBROUTINE PDGETRFLA( M, N, A, IA, JA, DESCA, IPIV, INFO )
 *
-*  -- ScaLAPACK routine (version 2.1.0) --
+*  -- ScaLAPACK routine --
 *     Copyright (c) 2020 Advanced Micro Devices, Inc.  All rights reserved.
 *     June 10, 2020
 *
@@ -28,7 +28,8 @@
 *  (upper trapezoidal if m < n). L and U are stored in sub( A ).
 *
 *  This is the right-looking Parallel Level 3 BLAS version of the
-*  algorithm.
+*  algorithm. It also implements 1-depth lookahead to get  better
+*  performance.
 *
 *  Notes
 *  =====
@@ -151,18 +152,31 @@
 *     ..
 *     .. Local Arrays ..
       INTEGER            IDUM1( 1 ), IDUM2( 1 )
-      INTEGER            LC1, LC2, NS, IAROW, IACOL, LACOL, JO, FSWAP
-      INTEGER            II, JJ, LB, PIDX( 2 )
+      INTEGER            LC1, LC2, NS, IAROW, IACOL, LACOL, JO
+      INTEGER            II, JJ, LB, BTAG, BTEST
+      INTEGER            MINTAG, MAXTAG, PIDX( 2 )
 *
 *     Panel Structure definition
 *
       TYPE PD_PANEL
-           INTEGER   ::   TM, TN, GM, GN, LDA
-           INTEGER   ::   BROWS, BCOLS, FSEND, IACOL, MYROW
-           INTEGER   ::   FCAST, ICTXT, XII, XJJ, LDM
-           INTEGER   ::   SN, K1, K2, KB
-           INTEGER   ::   PMEMSIZ
-           DOUBLE PRECISION, allocatable :: PMEM (:)
+           INTEGER           ::   TM, LN
+           INTEGER           ::   BROWS, IAROW, IACOL
+           INTEGER           ::   MYROW, MYCOL, NPROW, NPCOL
+           INTEGER           ::   MSGID, ICTXT
+           INTEGER           ::   XII, XJJ, LDM, LDA
+           INTEGER           ::   SN, K1, K2, KB
+*
+           INTEGER           ::   PSIZE, UCOLS, LDU, UOFF, USIZE
+*
+           CLASS(*), POINTER ::   PMEM
+           CLASS(*), POINTER ::   LMEM
+           CLASS(*), POINTER ::   UMEM
+           CLASS(*), POINTER ::   AMEM
+*
+           CLASS(*), POINTER ::   PBUFF
+           CLASS(*), POINTER ::   DTYPE
+           CLASS(*), POINTER ::   REQUEST
+           CLASS(*), POINTER ::   STATUS
       END TYPE PD_PANEL
 *
       TYPE(PD_PANEL) :: PANEL(2)
@@ -195,6 +209,10 @@
       LC2 = 2
       PIDX(1) = 2
       PIDX(2) = 1
+*     Message ID for broadcasts starts from zero */
+      MINTAG = 0
+      MAXTAG = 3000
+      BTAG = MINTAG
       
       LACOL = MOD( IACOL+1, NPCOL ) 
 *
@@ -240,8 +258,8 @@
       CALL PB_TOPGET( ICTXT, 'Broadcast', 'Columnwise', COLBTOP )
       CALL PB_TOPGET( ICTXT, 'Combine', 'Columnwise', COLCTOP )
       CALL PB_TOPSET( ICTXT, 'Broadcast', 'Rowwise', 'S-ring' )
-      CALL PB_TOPSET( ICTXT, 'Broadcast', 'Columnwise', ' ' )
-      CALL PB_TOPSET( ICTXT, 'Combine', 'Columnwise', ' ' )
+      CALL PB_TOPSET( ICTXT, 'Broadcast', 'Columnwise', 'I-ring' )
+      CALL PB_TOPSET( ICTXT, 'Combine', 'Columnwise', 'I-ring' )
 *
 *     Handle the first block of columns separately
 *
@@ -252,6 +270,8 @@
 
 *     WRITE(*,*) 'Process Co-ordinates:', MYROW, MYCOL
 
+      CALL PDPANEL_PINIT( PANEL(1), JB )
+      CALL PDPANEL_PINIT( PANEL(2), JB )
       allocate(TPIV(JB))
 *
 *     Factor diagonal and subdiagonal blocks and test for exact
@@ -260,66 +280,79 @@
       JJ = JN+1
       KB = MIN( MN-JJ+JA, DESCA( NB_ ) )
       II =  IA + JJ - JA
-
-      CALL PDGETF2K( M, JB, A, IA, JA, DESCA, TPIV, INFO )
 *
       IF( JB+1.LE.N ) THEN
 *
-*        Calculate Panel Data Size (TRSM + GEMM Inputs)
+*        Calculate Panel Data Size (TRSM + GEMM Inputs) and
+*        allocate panel memory
 *
          CALL PDPANEL_BCSIZ( A, M, N, IA, JA, IA, JA, JB, DESCA,
-     $                       PANEL(LC1) )
+     $                       PANEL(LC1), TPIV, BTAG )
+         BTAG = MOD( BTAG+1, MAXTAG )
+      END IF
 *
-*        Allocate Panel and broadcast
+      CALL PDGETF2K( M, JB, A, IA, JA, DESCA, TPIV,
+     $               PANEL(LC1), INFO )
 *
-         allocate(PANEL(LC1)%PMEM(PANEL(LC1)%PMEMSIZ))
+      IF( JB+1.LE.N ) THEN
+*
+*         Broadcast panel
+*
+         BTEST = 2
+         DO WHILE ( BTEST.EQ.2 )
+            CALL PDPANEL_BCAST( A, PANEL(LC1), BTEST )
+         END DO
          CALL ICOPYPV( M, JB, A, IA, JA, DESCA, TPIV, IPIV, INFO )
-         CALL PDPANEL_BCAST( A, PANEL(LC1) )
-         CALL PDGETF2_COMM( M, JB, A, IA, JA, DESCA, IPIV, INFO )
+         CALL PDPANEL_BWAIT( PANEL(LC1) )
+*
+*        Look Ahead Panel Broadcast Init and allocate
+*
+         CALL PDPANEL_BCSIZ( A, M, N, IA, JA, II, JJ, KB, DESCA,
+     $                       PANEL(LC2), TPIV, BTAG )
+         BTAG = MOD( BTAG+1, MAXTAG ) 
 *
 *        Update trailing matrix
 *
-*        WRITE(*, *) MYROW, MYCOL
          IF( MYCOL.EQ.LACOL ) THEN
-            JO = JB
-            FSWAP = 0
-            NU = MIN(JA+2*JB-1, N)
+            JO = KB
+            NU = MIN(JA+JB+JO-1, N)
+            IF( JO.EQ.0 ) THEN
+               JO = N-JA-JB+JA
+               NU = MIN(NU+JO, N)
+            END IF
 *
-*           Update small trailing matrix
+*           Update small (look-ahead part of) trailing matrix
 *
-            CALL PDUPDATE( M, NU, IA, JA, 0, JB, IA, JA, A, DESCA, TPIV,
-     $                     IPIV, PANEL(LC1), PANEL(LC2), 1, 0, INFO )
+            CALL PDUPDATE( M, NU, IA, JA, 0, JB, KB, IA, JA, A, DESCA,
+     $                     TPIV, IPIV, PANEL(LC1), PANEL(LC2),
+     $                     0, 0, INFO )
 *
 *           Look Ahead Panel Factorization
 *
-            CALL PDGETF2K( M-JJ+JA, KB, A, II, JJ, DESCA, TPIV, IINFO )
-            IF( INFO.EQ.0 .AND. IINFO.GT.0 )
-     $          INFO = IINFO + JJ - JA
+            IF( KB.GT.0 ) THEN
+               CALL PDGETF2K( M-JJ+JA, KB, A, II, JJ, DESCA, TPIV,
+     $                        PANEL(LC2), IINFO )
+               IF( INFO.EQ.0 .AND. IINFO.GT.0 )
+     $            INFO = IINFO + JJ - JA
+            END IF
          ELSE
             NU = 0
             JO = 0
-            FSWAP = 1
          END IF
-
-*        IF( N.GT.NU ) THEN
 *
-*           Look Ahead Panel Broadcast Init and allocate
+*        Update remaining large trailing matrix
+*        and broadcast Look Ahead panel
 *
-            CALL PDPANEL_BCSIZ( A, M, N, IA, JA, II, JJ, KB, DESCA,
-     $                          PANEL(LC2) )
-            allocate(PANEL(LC2)%PMEM(PANEL(LC2)%PMEMSIZ))
-*
-*           Update remaining large trailing matrix
-*           and broadcast Look Ahead panel
-*
-            CALL PDUPDATE( M, N, IA, JA, JO, JB, IA, JA, A, DESCA, TPIV,
-     $                     IPIV, PANEL(LC1), PANEL(LC2), FSWAP, 1,
-     $                     INFO )
-*        END IF
+         CALL PDUPDATE( M, N, IA, JA, JO, JB, PANEL(LC1)%LN, IA, JA, A,
+     $                  DESCA, TPIV, IPIV, PANEL(LC1), PANEL(LC2),
+     $                  1, 1, INFO )
 *
 *        De-allocate Panel
 *
-         deallocate(PANEL(LC1)%PMEM)
+         CALL PDPANEL_BFREE(PANEL(LC1))
+      ELSE
+         CALL ICOPYPV( M, JB, A, IA, JA, DESCA, TPIV, IPIV, INFO )
+         CALL PDGETF2_COMM( M, JB, A, IA, JA, DESCA, IPIV, INFO )
       END IF
 
       LC1 = LC2
@@ -336,62 +369,65 @@
          KB = MIN( MN-JJ+JA, DESCA( NB_ ) )
          LACOL = MOD( LACOL+1, NPCOL ) 
 *
+*        Look Ahead Panel Broadcast Init and allocate
+*
+         CALL PDPANEL_BCSIZ( A, M, N, IA, JA, II, JJ, KB, DESCA,
+     $                       PANEL(LC2), TPIV, BTAG )
+         BTAG = MOD( BTAG+1, MAXTAG ) 
+*
 *        Update trailing matrix
 *
-*        WRITE(*, *) MYROW, MYCOL
          IF( MYCOL.EQ.LACOL ) THEN
             JO = KB
-            FSWAP = 0
-            NU = MIN(J+2*JB-1, N)
+            NU = MIN(J+JB+JO-1, N)
+            IF( JO.EQ.0 ) THEN
+               JO = N-J-JB+JA
+               NU = MIN(NU+JO, N)
+            END IF
 *
-*           Update small trailing matrix
+*           Update small (look-ahead part of) trailing matrix
 *
-            CALL PDUPDATE( M, NU, I, J, 0, JB, IA, JA, A, DESCA, TPIV,
-     $                     IPIV, PANEL(LC1), PANEL(LC2), 1, 0, INFO )
+            CALL PDUPDATE( M, NU, I, J, 0, JB, KB, IA, JA, A, DESCA,
+     $                     TPIV, IPIV, PANEL(LC1), PANEL(LC2),
+     $                     0, 0, INFO )
 *
 *           Look Ahead Panel Factorization
 *
-            CALL PDGETF2K( M-JJ+JA, KB, A, II, JJ, DESCA, TPIV, IINFO )
-            IF( INFO.EQ.0 .AND. IINFO.GT.0 )
-     $          INFO = IINFO + JJ - JA
+            IF( KB.GT.0 ) THEN
+               CALL PDGETF2K( M-JJ+JA, KB, A, II, JJ, DESCA, TPIV,
+     $                        PANEL(LC2), IINFO )
+               IF( INFO.EQ.0 .AND. IINFO.GT.0 )
+     $             INFO = IINFO + JJ - JA
+            END IF
          ELSE
             NU = 0
             JO = 0
-            FSWAP = 1
          END IF
-*        IF( N.GT.NU ) THEN
 *
-*           Look Ahead Panel Broadcast Init and allocate
+*        Update remaining large trailing matrix
+*        and broadcast Look Ahead panel
 *
-            CALL PDPANEL_BCSIZ( A, M, N, IA, JA, II, JJ, KB, DESCA,
-     $                          PANEL(LC2) )
-            allocate(PANEL(LC2)%PMEM(PANEL(LC2)%PMEMSIZ))
-*
-*           Update remaining large trailing matrix
-*           and broadcast Look Ahead panel
-*
-            CALL PDUPDATE( M, N, I, J, JO, JB, IA, JA, A, DESCA, TPIV,
-     $                     IPIV, PANEL(LC1), PANEL(LC2), FSWAP, 1,
-     $                     INFO )
-*        END IF
+         CALL PDUPDATE( M, N, I, J, JO, JB, PANEL(LC1)%LN, IA, JA, A,
+     $                  DESCA, TPIV, IPIV, PANEL(LC1), PANEL(LC2),
+     $                  1, 1, INFO )
 *
 *        De-allocate Panel
 *
-         deallocate(PANEL(LC1)%PMEM)
+         CALL PDPANEL_BFREE(PANEL(LC1))
          LC1 = LC2
          LC2 = PIDX(LC2) 
 *
    10 CONTINUE
 *
-*     CALL ICOPYPV( M-JJ+JA, KB, A, II, JJ, DESCA, TPIV, IPIV, INFO )
-*     CALL PDGETF2_COMM( M-JJ+JA, KB, A, II, JJ, DESCA, IPIV, INFO )
-      CALL PDUPDATE( M, N, II, JJ, 0, KB, IA, JA, A, DESCA, TPIV, IPIV,
-     $               PANEL(LC1), PANEL(LC2), 1, 0, INFO )
-
-*     IF( N.GT.NU ) THEN
-         deallocate(PANEL(LC1)%PMEM)
-*     END IF
+      IF( JB+1.LE.N ) THEN
+         CALL PDUPDATE( M, N, II, JJ, 0, KB, PANEL(LC1)%LN, IA, JA, A,
+     $                  DESCA, TPIV, IPIV, PANEL(LC1), PANEL(LC2),
+     $                  1, 0, INFO )
+         CALL PDPANEL_BFREE(PANEL(LC1))
+      END IF
       deallocate(TPIV)
+      CALL PDPANEL_PFREE( PANEL(1) )
+      CALL PDPANEL_PFREE( PANEL(2) )
 
       IF( INFO.EQ.0 )
      $   INFO = MN + 1
@@ -409,3 +445,4 @@
 *     End of PDGETRF
 *
       END
+ 

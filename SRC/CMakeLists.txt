@@ -90,7 +90,7 @@ set (DLASRC
    pdgeqrf.f pdgerfs.f pdgerq2.f pdgerqf.f                               
    pdgesv.f  pdgesvd.f pdgesvx.f pdgetf2.f pdgetrf.f pdgetri.f pdgetrs.f 
    pdggqrf.f pdggrqf.f pdlabrd.f pdgetf2K.f pdupdate.f pdgetrf0.f
-   pdgetrfla.f pdgetf2_comm.f
+   pdgetrfla.f         pdgetf2_comm.f          icopypv.f
    pdlacon.f pdlacp2.f pdlacpy.f pdlahrd.f pdlange.f pdlanhs.f pdlansy.f 
    pdlantr.f pdlapiv.f pdlapv2.f pdlaqge.f pdlaqsy.f pdlarf.f  pdlarfb.f 
    pdlarfg.f pdlarft.f pdlase2.f pdlaset.f pdlascl.f pdlassq.f pdlaswp.f 

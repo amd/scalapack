@@ -1,5 +1,12 @@
 /* ---------------------------------------------------------------------
 *
+*     Copyright (c) 2020 Advanced Micro Devices, Inc.  All rights reserved.
+*     August 11, 2020
+*
+*  ---------------------------------------------------------------------
+*/
+/* ---------------------------------------------------------------------
+*
 *  -- PBLAS auxiliary routine (version 2.0) --
 *     University of Tennessee, Knoxville, Oak Ridge National Laboratory,
 *     and University of California, Berkeley.
@@ -62,6 +69,9 @@ PBTYP_T * PB_Cdtypeset()
    TypeStruct.Cgebs2d   = Cdgebs2d;
    TypeStruct.Cgebr2d   = Cdgebr2d;
    TypeStruct.Cgsum2d   = Cdgsum2d;
+#ifdef ENABLE_LOOK_AHEAD_FOR_LU
+   TypeStruct.Cgesr2d   = Cugebx2d;
+#endif /* ENABLE_LOOK_AHEAD_FOR_LU */
 
    TypeStruct.Fmmadd    = dmmadd_;
    TypeStruct.Fmmcadd   = dmmcadd_;

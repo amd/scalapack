@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
 *
-*  -- PBLAS routine (version 2.1.0) --
+*  -- PBLAS routine --
 *     Copyright (c) 2020 Advanced Micro Devices, Inc.  All rights reserved.
 *     June 10, 2020
 *
@@ -15,36 +15,27 @@
 #include "PBblacs.h"
 #include "PBblas.h"
 
-void pdpanel_bcast_(double * A, pd_panel * panel)
+void pdpanel_bcast_(double * A, pd_panel * panel, int * btest)
 {
    PBTYP_T *type;
    char *top;
+   int rank, next, prev, size;
 
-   if(panel->fcast)
+   if((size = panel->npcol) < 2)
    {
+     *btest = AOCL_SUCCESS;
+     return;
+   }
 /*
 *  Get type structure
 */
-     type = PB_Cdtypeset();
+   type = PB_Cdtypeset();
+   rank = panel->mycol;
 
-     if(panel->fsend)
-     {
-       double *XAPTR;
-       XAPTR = Mptr( ((char *)A), panel->Xii, panel->Xjj, panel->ldm, type->size );
-       top = PB_Ctop( &panel->ictxt, BCAST, ROW, TOP_GET );
-       type->Cgebs2d( panel->ictxt, ROW, top,
-                      panel->brows, panel->bcols,
-                      XAPTR, panel->ldm );
-     }
-     else
-     {
-       top = PB_Ctop( &panel->ictxt, BCAST, ROW, TOP_GET );
-       type->Cgebr2d( panel->ictxt, ROW, top,
-                      panel->brows, panel->bcols, panel->pmem,
-                      panel->brows, panel->myrow, panel->iacol );
-     }
-   }
-  return;
+   *btest = type->Cgesr2d(panel->ictxt, "Row", "SRing", panel->msgid, panel->pbuff, 1,
+                          panel->mycol, panel->iacol, panel->dtype, panel->status);
+
+   return;
 /*
 *  End of pdpanel_bcast_
 */

@@ -156,8 +156,11 @@
 *
 *     Print version
 *
-      CALL GET_AOCL_SCALAPACK_VERSION( SVERSION )
-      WRITE(*, *) SVERSION
+      IF( IAM.EQ.0 ) THEN
+          CALL GET_AOCL_SCALAPACK_VERSION( SVERSION )
+          WRITE(*, *) 
+          WRITE(*, *) 'AOCL Version: ', SVERSION
+      END IF
 *
 *     Print headings
 *

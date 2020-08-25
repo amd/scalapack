@@ -1,3 +1,10 @@
+/* ---------------------------------------------------------------------
+*
+*     Copyright (c) 2020 Advanced Micro Devices, Inc.  All rights reserved.
+*     August 11, 2020
+*
+*  ---------------------------------------------------------------------
+*/
 #ifndef BDEF_H
 #define BDEF_H 1
 
@@ -22,12 +29,15 @@ struct bLaCsScOpE
 typedef struct bLaCsCoNtExT BLACSCONTEXT;
 struct bLaCsCoNtExT
 {
-   BLACSSCOPE rscp, cscp, ascp, pscp; /* row, column, all, and pt2pt scopes */
-   BLACSSCOPE *scp;                   /* pointer to present scope */
-   int TopsRepeat;                    /* Use only repeatable topologies? */
-   int TopsCohrnt;                    /* Use only coherent topologies? */
-   int Nb_bs, Nr_bs;           /* for bcast general tree and multiring tops */
-   int Nb_co, Nr_co;           /* for combine general tree and multiring tops */
+   BLACSSCOPE rscp, cscp, ascp, pscp;       /* row, column, all, and pt2pt scopes */
+#ifdef ENABLE_LOOK_AHEAD_FOR_LU 
+   BLACSSCOPE lscp;                         /* row scope for look ahead panel */
+#endif /* ENABLE_LOOK_AHEAD_FOR_LU */
+   BLACSSCOPE *scp;                         /* pointer to present scope */
+   int TopsRepeat;                          /* Use only repeatable topologies? */
+   int TopsCohrnt;                          /* Use only coherent topologies? */
+   int Nb_bs, Nr_bs;                        /* for bcast general tree and multiring tops */
+   int Nb_co, Nr_co;                        /* for combine general tree and multiring tops */
 };
 
 /*
@@ -60,6 +70,28 @@ struct bLaCbUfF
    MPI_Datatype dtype;  /* data type of buffer */
    int N;                  /* number of elements of data type in buff */
    BLACBUFF *prev, *next;  /* pointer to the other BLACBUFF in queue */
+};
+
+#define    AOCL_SUCCESS         0
+#define    AOCL_FAILURE         1
+#define    AOCL_KEEP_POLLING    2
+
+/*
+ *  Definition of buffer type for 
+ *  user defined datatype communications
+ */
+typedef struct aOcLpBuFf AOCLPBUFF;
+struct aOcLpBuFf
+{
+   char *Buff;             /* send/recv buffer */
+   int count;              /* Number of elements in the packed buff */
+   int root;               /* number of elements of data type in buff */
+   int rank;
+   int msgid;
+
+   MPI_Datatype *dtype;    /* data type of buffer */
+   MPI_Request  *request;
+   MPI_Status   *status;
 };
 
 /*
@@ -368,6 +400,7 @@ int BI_ContxtNum(BLACSCONTEXT *ctxt);
 #define dgerv2d_   dgerv2d
 #define dgebs2d_   dgebs2d
 #define dgebr2d_   dgebr2d
+#define ugesr2d_   ugesr2d
 #define dtrsd2d_   dtrsd2d
 #define dtrrv2d_   dtrrv2d
 #define dtrbs2d_   dtrbs2d
@@ -460,6 +493,7 @@ int BI_ContxtNum(BLACSCONTEXT *ctxt);
 #define dgerv2d_   DGERV2D
 #define dgebs2d_   DGEBS2D
 #define dgebr2d_   DGEBR2D
+#define ugesr2d_   UGESR2D
 #define dtrsd2d_   DTRSD2D
 #define dtrrv2d_   DTRRV2D
 #define dtrbs2d_   DTRBS2D

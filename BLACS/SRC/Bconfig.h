@@ -14,6 +14,7 @@
 #include <math.h>
 #include <stdarg.h>
 #include <mpi.h>
+#include "../../AOCL_DTL/SRC/aocldtl.h"
 
 /*
  * These macros define the naming strategy needed for a fortran

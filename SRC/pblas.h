@@ -1,5 +1,12 @@
 /* ---------------------------------------------------------------------
 *
+*     Copyright (c) 2020 Advanced Micro Devices, Inc.  All rights reserved.
+*     August 11, 2020
+*
+*  ---------------------------------------------------------------------
+*/
+/* ---------------------------------------------------------------------
+*
 *  -- ScaLAPACK routine (version 1.0) --
 *     University of Tennessee, Knoxville, Oak Ridge National Laboratory,
 *     and University of California, Berkeley.
@@ -643,8 +650,16 @@ typedef char *          F_CHAR;
 #define pztranu_          PZTRANU
 #define pztranc_          PZTRANC
                                                             /* LOOK AHEAD ROUTINES */
+#define pdpanel_lcopy_    PDPANEL_LCOPY
+#define pdpanel_lcast_    PDPANEL_LCAST
 #define pdpanel_bcsiz_    PDPANEL_BCSIZ
+#define pdpanel_bpack_    PDPANEL_BPACK
 #define pdpanel_bcast_    PDPANEL_BCAST
+#define pdpanel_ucast_    PDPANEL_UCAST
+#define pdpanel_bwait_    PDPANEL_BWAIT
+#define pdpanel_bfree_    PDPANEL_BFREE
+#define pdpanel_pinit_    PDPANEL_PINIT
+#define pdpanel_pfree_    PDPANEL_PFREE
 
 #endif
 
@@ -1086,8 +1101,16 @@ typedef char *          F_CHAR;
 #define pztranu_          pztranu
 #define pztranc_          pztranc
                                                             /* LOOK AHEAD ROUTINES */
+#define pdpanel_lcopy_    pdpanel_lcopy
+#define pdpanel_lcast_    pdpanel_lcast
 #define pdpanel_bcsiz_    pdpanel_bcsiz
+#define pdpanel_bpack_    pdpanel_bpack
 #define pdpanel_bcast_    pdpanel_bcast
+#define pdpanel_ucast_    pdpanel_ucast
+#define pdpanel_bwait_    pdpanel_bwait
+#define pdpanel_bfree_    pdpanel_bfree
+#define pdpanel_pinit_    pdpanel_pinit
+#define pdpanel_pfree_    pdpanel_pfree
 
 #endif
 

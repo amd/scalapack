@@ -3,13 +3,17 @@
 *  =====================================================================
       SUBROUTINE PDGETRF( M, N, A, IA, JA, DESCA, IPIV, INFO )
 *
+*  -- ScaLAPACK routine (version 2.1.0) --
+*     Copyright (c) 2020 Advanced Micro Devices, Inc.  All rights reserved.
+*     June 10, 2020
+*
 *  -- ScaLAPACK routine (version 1.7) --
 *     University of Tennessee, Knoxville, Oak Ridge National Laboratory,
 *     and University of California, Berkeley.
 *     May 25, 2001
 *
 *     .. Scalar Arguments ..
-      INTEGER            IA, INFO, JA, M, N
+      INTEGER            INFO, IA, JA, M, N
 *     ..
 *     .. Array Arguments ..
       INTEGER            DESCA( * ), IPIV( * )
@@ -135,26 +139,60 @@
 *
 *  =====================================================================
 *
+#ifdef ENABLE_LOOK_AHEAD_FOR_LU
 *     ..
 *     .. Local Scalars ..
 
 *     Defining the threshold to invoke look-ahead      
-      INTEGER            LU_THRESHOLD
-      PARAMETER         (LU_THRESHOLD = 0)
+      INTEGER            CTXT_, LU_THRESHOLD, NB_, MN, NB
+      INTEGER            ICTXT, MYCOL, MYROW, NPCOL, NPROW
+*     ..
+*     LU_THRESHOLD is used to filter out lower size matrices
+*     from taking lookahead path as it may not provide any gain
+*
+      PARAMETER          (CTXT_ = 2, LU_THRESHOLD = 0, NB_ = 6)
+*     ..
+*     .. External Subroutines ..
+      EXTERNAL           BLACS_GRIDINFO, PDGETRFLA, PDGETRF0
+*     ..
+*     .. Intrinsic Functions ..
+      INTRINSIC          MIN
+*     ..
+*     .. Executable Statements ..
+*
+*     Get grid parameters
+*
+      ICTXT = DESCA( CTXT_ )
+      CALL BLACS_GRIDINFO( ICTXT, NPROW, NPCOL, MYROW, MYCOL )
 *
 #ifdef AOCL_DTL_ADVANCED_TRACE_ENABLE
       CALL AOCL_DTL_TRACE_ENTRY(__FILE__, __LINE__, ' ')
 #endif
-
-#ifdef ENABLE_LOOK_AHEAD_FOR_LU
-      IF( (M.GT.LU_THRESHOLD).OR.(N.GT.LU_THRESHOLD)) THEN
-         CALL PDGETRFLA( M, N, A, IA, JA, DESCA, IPIV, INFO )
-      ELSE
+      MN = MIN( M, N )
+      NB = DESCA( NB_ )
+*
+      IF( ( MN.LT.LU_THRESHOLD ).OR.( NB.GE.MN ) ) THEN
+*
+*        Default LU for small matrices and
+*        when block size is larger than matrix size
+*
          CALL PDGETRF0( M, N, A, IA, JA, DESCA, IPIV, INFO )
+      ELSE
+         IF( NPCOL.LT.2 ) THEN
+*
+*           Default LU when number of process colums is 1
+*
+            CALL PDGETRF0( M, N, A, IA, JA, DESCA, IPIV, INFO )
+         ELSE
+*
+*           LU with Look Ahead Depth 1
+*
+            CALL PDGETRFLA( M, N, A, IA, JA, DESCA, IPIV, INFO )
+         END IF
       END IF
-#else
+#else /* ENABLE_LOOK_AHEAD_FOR_LU */
       CALL PDGETRF0( M, N, A, IA, JA, DESCA, IPIV, INFO )
-#endif
+#endif /* ENABLE_LOOK_AHEAD_FOR_LU */
 *
 #ifdef AOCL_DTL_ADVANCED_TRACE_ENABLE
       CALL AOCL_DTL_TRACE_EXIT(__FILE__, __LINE__, ' ')

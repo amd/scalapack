@@ -1,3 +1,12 @@
+/* ---------------------------------------------------------------------
+*
+*  -- BLACS routine (version 2.1.0) --
+*     Copyright (c) 2020 Advanced Micro Devices, Inc.  All rights reserved.
+*     August 11, 2020
+*
+*  ---------------------------------------------------------------------
+*/
+
 #include "Bdef.h"
 
 #if (INTFACE == C_CALL)
@@ -111,6 +120,16 @@ F_VOID_FUNC blacs_gridmap_(int *ConTxt, int *usermap, int *ldup, int *nprow0,
  */
    MPI_Comm_split(comm, mycol, myrow, &ctxt->cscp.comm);
 
+#ifdef ENABLE_LOOK_AHEAD_FOR_LU
+/*
+ * Duplicate MPI communicators for scope = 'row' for
+ * Look-Ahead panel broadcasts
+ */
+   MPI_Comm_split(comm, myrow+nprow, mycol, &ctxt->lscp.comm);
+
+   ctxt->lscp.Np = npcol;
+   ctxt->lscp.Iam = mycol;
+#endif /* ENABLE_LOOK_AHEAD_FOR_LU */
    ctxt->rscp.Np = npcol;
    ctxt->rscp.Iam = mycol;
    ctxt->cscp.Np = nprow;
@@ -132,6 +151,10 @@ F_VOID_FUNC blacs_gridmap_(int *ConTxt, int *usermap, int *ldup, int *nprow0,
    ctxt->cscp.ScpId = ctxt->ascp.ScpId = iptr[0];
    ctxt->pscp.MaxId = ctxt->rscp.MaxId = ctxt->cscp.MaxId =
    ctxt->ascp.MaxId = iptr[1];
+#ifdef ENABLE_LOOK_AHEAD_FOR_LU
+   ctxt->pscp.MinId = ctxt->pscp.ScpId = 0;
+   ctxt->pscp.MaxId = iptr[0] - 1;
+#endif /* ENABLE_LOOK_AHEAD_FOR_LU */
    free(iptr);
 
 }

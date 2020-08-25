@@ -138,7 +138,7 @@ DLASRC = \
    pdgeqrf.o pdgerfs.o pdgerq2.o pdgerqf.o                               \
    pdgesv.o  pdgesvd.o pdgesvx.o pdgetf2.o pdgetrf.o pdgetri.o pdgetrs.o \
    pdggqrf.o pdggrqf.o pdlabrd.o pdgetf2K.o pdupdate.o pdgetrf0.o \
-   pdgetrfla.o  pdgetf2_comm.o \
+   pdgetrfla.o         pdgetf2_comm.o       icopypv.o \
    pdlacon.o pdlacp2.o pdlacpy.o pdlahrd.o pdlange.o pdlanhs.o pdlansy.o \
    pdlantr.o pdlapiv.o pdlapv2.o pdlaqge.o pdlaqsy.o pdlarf.o  pdlarfb.o \
    pdlarfg.o pdlarft.o pdlase2.o pdlaset.o pdlascl.o pdlassq.o pdlaswp.o \

@@ -2,7 +2,7 @@
 
 /* ---------------------------------------------------------------------
 *
-*  -- AOCL ScaLAPACK routine (version 2.2.1) --
+*  -- AOCL ScaLAPACK routine --
 *     Copyright (c) 2020 Advanced Micro Devices, Inc.  All rights reserved.
 *     July 13, 2020
 *

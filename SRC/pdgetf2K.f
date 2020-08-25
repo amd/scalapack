@@ -1,6 +1,6 @@
-      SUBROUTINE PDGETF2K( M, N, A, IA, JA, DESCA, IPIV, INFO )
+      SUBROUTINE PDGETF2K( M, N, A, IA, JA, DESCA, IPIV, PANEL, INFO )
 *
-*  -- ScaLAPACK routine (version 2.1.0) --
+*  -- ScaLAPACK routine --
 *     Copyright (c) 2020 Advanced Micro Devices, Inc.  All rights reserved.
 *     June 10, 2020
 *
@@ -10,6 +10,28 @@
 *     .. Array Arguments ..
       INTEGER            DESCA( * ), IPIV( * )
       DOUBLE PRECISION   A( * )
+      TYPE PD_PANEL
+           INTEGER           ::   TM, LN
+           INTEGER           ::   BROWS, IAROW, IACOL
+           INTEGER           ::   MYROW, MYCOL, NPROW, NPCOL
+           INTEGER           ::   MSGID, ICTXT
+           INTEGER           ::   XII, XJJ, LDM, LDA
+           INTEGER           ::   SN, K1, K2, KB
+*
+           INTEGER           ::   PSIZE, UCOLS, LDU, UOFF, USIZE
+*
+           CLASS(*), POINTER ::   PMEM
+           CLASS(*), POINTER ::   LMEM
+           CLASS(*), POINTER ::   UMEM
+           CLASS(*), POINTER ::   AMEM
+*
+           CLASS(*), POINTER ::   PBUFF
+           CLASS(*), POINTER ::   DTYPE
+           CLASS(*), POINTER ::   REQUEST
+           CLASS(*), POINTER ::   STATUS
+      END TYPE PD_PANEL
+*
+      TYPE(PD_PANEL) :: PANEL
 *     ..
 *
 *  Purpose
@@ -17,7 +39,12 @@
 *
 *  PDGETF2K computes an LU factorization of a general M-by-N
 *  distributed matrix sub( A ) = A(IA:IA+M-1,JA:JA+N-1) using
-*  partial pivoting with row interchanges.
+*  partial pivoting with row interchanges. The matrix is assumed
+*  to be present entirely in a single column of processes in the
+*  2D grid. This function is an internal function called by LU
+*  factorization using lookahead panel optimization. In addition,
+*  the top L11 matrix is copied to a temporary buffer in the 
+*  panel struct.
 *
 *  The factorization has the form sub( A ) = P * L * U, where P is a
 *  permutation matrix, L is lower triangular with unit diagonal
@@ -120,6 +147,10 @@
 *          IPIV(i) -> The global row local row i was swapped with.
 *          This array is tied to the distributed matrix A.
 *
+*  PANEL   (local input) pointer to pd_panel struct
+*          The PANEL structure contains pointers to i/o matrices,  their
+*          sizes &  other parameters related to lookahead implementation
+*
 *  INFO    (local output) INTEGER
 *          = 0:  successful exit
 *          < 0:  If the i-th argument is an array and the j-entry had
@@ -143,9 +174,9 @@
       PARAMETER          ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     ..
 *     .. Local Scalars ..
-      CHARACTER          ROWBTOP
+      CHARACTER          COLBTOP
       INTEGER            I, IACOL, IAROW, ICOFF, ICTXT, IIA, IROFF, J,
-     $                   JJA, MN, MYCOL, MYROW, NPCOL, NPROW, PI
+     $                   JJA, MN, MYCOL, MYROW, NPCOL, NPROW, PI, LDA
       DOUBLE PRECISION   GMAX
 *     ..
 *     .. External Subroutines ..
@@ -161,6 +192,7 @@
 *     Get grid parameters.
 *
       ICTXT = DESCA( CTXT_ )
+      LDA   = DESCA( LLD_ )
       CALL BLACS_GRIDINFO( ICTXT, NPROW, NPCOL, MYROW, MYCOL )
 *
 *     Test the input parameters.
@@ -199,7 +231,7 @@
       MN = MIN( M, N )
       CALL INFOG2L( IA, JA, DESCA, NPROW, NPCOL, MYROW, MYCOL, IIA, JJA,
      $              IAROW, IACOL )
-      CALL PB_TOPGET( ICTXT, 'Broadcast', 'Rowwise', ROWBTOP )
+      CALL PB_TOPGET( ICTXT, 'Broadcast', 'Columnwise', COLBTOP )
 *
       PI = 1
       IF( MYCOL.EQ.IACOL ) THEN
@@ -236,6 +268,15 @@
             PI = PI + 1
    10    CONTINUE
 *
+*        Copy L11 into LMEM.
+*
+         IF( MYROW.EQ.IAROW )
+     $      CALL PDPANEL_LCOPY( A, IA, JA, LDA, N, PANEL ) 
+*
+*        Broadcast L11 with-in column
+*
+         CALL PDPANEL_LCAST( PANEL, N )
+*
       END IF
 *
       RETURN
@@ -243,3 +284,4 @@
 *     End of PDGETF2K
 *
       END
+

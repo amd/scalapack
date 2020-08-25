@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
 *
-*  -- PBLAS routine (version 2.1.0) --
+*  -- PBLAS routine --
 *     Copyright (c) 2020 Advanced Micro Devices, Inc. All rights reserved.
 *     June 2, 2020
 *
@@ -18,25 +18,29 @@
 void pdpanel_bcsiz_(double * A, int * M, int * N,
                     int * IA, int * JA, int * II,
                     int * JJ, int * JB, int * desca,
-                    pd_panel * panel )
+                    pd_panel * panel, int * tpiv,
+                    int * tag )
 {
    int nprow, npcol, myrow, mycol, rsrc, csrc;
    int ictxt;
    int INB, NB, IMB, MB;
    int IIA, JJA;
 
-   int TM, TN, GM, GN;
-   int psize;
+   int TM, GM;
    
    int Ad[DLEN_], lda;
    int Ai, Aj;
    int iarow, iacol;
    int remr, remc;
-   int trsm_alloc, gemm_alloc;
-   int trsm_bcast, gemm_bcast;
+
+   int Xrow, Xcol, Xii, Xjj;
 
    PBTYP_T        * type;
 
+/*
+*  Get type structure
+*/
+   type = PB_Cdtypeset();
    ictxt = desca[CTXT1_];
    rsrc = desca[RSRC1_]; 
    csrc = desca[CSRC1_]; 
@@ -48,127 +52,89 @@ void pdpanel_bcsiz_(double * A, int * M, int * N,
 
    PB_CargFtoC( *IA, *JA, desca, &Ai, &Aj, Ad );
    PB_Cinfog2l( *II-1, *JJ-1, Ad, nprow, npcol, myrow, mycol,
-                &IIA, &JJA, &iarow, &iacol); 
-  
+                &IIA, &JJA, &iarow, &iacol);
+ 
    INB = Ad[INB_];
    IMB = Ad[IMB_];
    lda = Ad[LLD_];
 
-   Mnumroc( remr, *M-*II+1, *II-1, IMB, MB, iarow, rsrc, nprow );
-   Mnumroc( remc, *N-*JJ+1, *JJ-1, INB, NB, iacol, csrc, npcol );
+   /* Remaining rows / columns in own process (self)  */
+   Mnumroc( remr, *M-*II+1, *II-1, IMB, MB, myrow, rsrc, nprow );
+   Mnumroc( remc, *N-*JJ+1, *JJ-1, INB, NB, mycol, csrc, npcol );
 
-   /* TRSM Broadcast Data Size calculation */
-   trsm_bcast = 1;
-   TM = *JB;
-   TN = *JB;
-   if(iacol == mycol && iarow == myrow)
-   {
-     trsm_alloc = -1; /* Local Matrix */
-   }
-   else if(iacol != mycol && iarow == myrow)
-   {
-     trsm_alloc = 1; /* Allocate Local Buffer to receive data */
-   }
-   else
-   {
-     TM = 0;
-     TN = 0;
-     trsm_alloc = 0; /* Doesn't require LL (TRSM input) data */
-     trsm_bcast = 0;
-   }
-   if(*JB < NB)
-     trsm_bcast = 0;
-
-   /* GEMM Broadcast Data Size calculation */
-   gemm_bcast = 1;
-   GM = remr;
-   GN = *JB;
-   if(iacol == mycol && iarow == myrow)
-   {
-     GM = remr - TM;
-     GN = *JB;
-     gemm_alloc = -1; /* Local Matrix */
-   }
-   else if(iacol == mycol && iarow != myrow)
-   {
-     GM = remr;
-     GN = *JB;
-     gemm_alloc = -1; /* Local Matrix */
-   }
-   else if(iacol != mycol && iarow == myrow)
-   {
-     GM = remr - TM;
-     GN = *JB;
-     gemm_alloc = 1; /* Allocate Local Buffer to receive data */
-   }
-   else
-   {
-     GM = remr;
-     GN = *JB;
-     gemm_alloc = 1; /* Allocate Local Buffer to receive data */
-   }
-   if(GM <= 0)
-     gemm_bcast = 0;
-
-   /* Check even though we have data, should it be broadcasted
-    * since the recepients may not want the data */
-   // if(trsm_alloc == -1 && remc == (*N-*JJ+1))
-   if(remc == (*N-*JJ+1))
-   {
-     trsm_bcast = 0;
-     gemm_bcast = 0;
-   }
-
-   if(trsm_bcast || gemm_bcast)
-   {
-     int bcast_size, i;
-     int brows, bcols;
-
-     brows = TM + GM;
-     bcols = MAX(TN, GN); /* These two should be same */
-
-     bcast_size = brows * bcols;
-     if(iacol == mycol)
-     {
-       psize = 0;
-     }
-     else
-     {
-       psize = bcast_size;
-     }
-   }
-   else
-   {
-     psize = 0;
-   }
+   /* TRSM  & GEMM Broadcast Data Size calculation */
+   TM = (myrow != iarow) ? 0 : *JB;
+   GM = (iarow == myrow) ? remr - TM : remr;
   
    /* Fill the panel broadcast buffer structure with 
     * trsm, gemm data sizes */
+
    {
-     int Xrow, Xcol, Xii, Xjj;
+      Minfog2l( *II-1, *JJ-1, Ad, nprow, npcol, myrow, mycol, Xii, Xjj, Xrow, Xcol );
+      panel->lda   = lda;
+      panel->TM    = TM;
+      panel->brows = GM;
 
-     Minfog2l( *II-1, *JJ-1, Ad, nprow, npcol, myrow, mycol, Xii, Xjj, Xrow, Xcol );
-     panel->TM = TM;
-     panel->TN = TN;
-     panel->GM = GM;
-     panel->GN = GN;
-     panel->lda = (TM + GM);
-     panel->psize = psize;
-     panel->brows = TM + GM;
-     panel->bcols = MAX(TN, GN); /* These two should be same */
-     panel->fcast = (trsm_bcast || gemm_bcast);
-     panel->fsend = (iacol == mycol);
-     panel->iacol = iacol;
-     panel->myrow = myrow;
-     panel->ictxt = ictxt;
-     panel->Xii = Xii;
-     panel->Xjj = Xjj;
-     panel->ldm = lda;
+      panel->msgid = *tag;
+      panel->nprow = nprow;
+      panel->npcol = npcol;
+      panel->iarow = iarow;
+      panel->iacol = iacol;
+      panel->myrow = myrow;
+      panel->mycol = mycol;
+      panel->ictxt = ictxt;
 
-     panel->SN = MIN(*M - *JJ + *JA, *JB);
-     panel->K1 = *II;
-     panel->K2 = *JJ;
-     panel->JB = *JB;
+      panel->SN = MIN(*M - *JJ + *JA, *JB);
+      panel->K1 = *II;
+      panel->K2 = *JJ;
+      panel->JB = *JB;
+
+      panel->LN = remc;
+
+      /* Allocate memory for column panel (L11||L21) */
+      panel->pmem  = NULL;
+      panel->psize = 0;
+
+      if(mycol == iacol)
+      {
+         panel->LN  -= *JB;
+         panel->ldm  = lda;
+         panel->pmem = Mptr( ((char *) A), Xii + TM, Xjj, panel->ldm, type->size );
+      }
+      else
+      {
+         panel->ldm   = GM;
+         panel->psize = panel->brows * *JB;
+         if(panel->psize > 0)
+            panel->pmem  = malloc(panel->psize * sizeof(double));
+      }
+
+      /* Pack column panel for broadcast */
+      pdpanel_bpack_(panel, tpiv);
+
+      panel->Xii = Xii;
+      panel->Xjj = Xjj + *JB * (mycol == iacol);
+
+      /* Allocate memory for row panel U */
+      panel->umem  = NULL;
+      panel->usize = 0;
+      panel->uoff  = 0;
+      panel->ucols = (mycol == iacol) ? (remc - *JB) : remc;
+
+      if(myrow == iarow)
+      {
+         panel->ldu  = lda;
+         panel->umem = Mptr(((char *) A), Xii, panel->Xjj, lda, type->size);
+      }
+      else
+      {
+         panel->ldu   = *JB;
+         panel->usize = *JB * panel->ucols;
+         if(panel->usize > 0)
+            panel->umem = malloc(panel->usize * sizeof(double));
+      }
+
+      panel->amem = A;
    }
 
    return;
