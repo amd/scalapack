@@ -271,7 +271,7 @@
 
 #ifdef F2C
             CALL CLADIV( ALPHA, CMPLX( ONE ), ALPHA-BETA )
-#elif F90
+#else
             ALPHA = CLADIV( CMPLX( ONE ), ALPHA-BETA )
 #endif
             CALL PCSCAL( N-1, ALPHA, X, IX, JX, DESCX, INCX )
@@ -288,7 +288,7 @@
 
 #ifdef F2C
             CALL CLADIV( ALPHA, CMPLX( ONE ), ALPHA-BETA )
-#elif F90
+#else
             ALPHA = CLADIV( CMPLX( ONE ), ALPHA-BETA )
 #endif
             CALL PCSCAL( N-1, ALPHA, X, IX, JX, DESCX, INCX )

@@ -145,7 +145,7 @@
 #ifdef F2C_COMPLEX
          CALL CDOTC_F2C( TMP, N-I+1, WORK, 1, WORK( N+1 ), 1 )
          ALPHA = -HALF*TAU*TMP
-#elif USE_BLAS
+#else
          ALPHA = -HALF*TAU*CDOTC( N-I+1, WORK, 1, WORK( N+1 ), 1 )
 #endif
          CALL CAXPY( N-I+1, ALPHA, WORK, 1, WORK( N+1 ), 1 )
@@ -202,7 +202,7 @@
 #ifdef F2C_COMPLEX
          CALL CDOTC_F2C( TMP, N-K-I+1, A( K+I, I ), 1, WORK, 1 )
          ALPHA = -HALF*TAU*TMP
-#elif USE_BLAS
+#else
          ALPHA = -HALF*TAU*CDOTC( N-K-I+1, A( K+I, I ), 1, WORK, 1 )
 #endif
          CALL CAXPY( N-K-I+1, ALPHA, A( K+I, I ), 1, WORK, 1 )

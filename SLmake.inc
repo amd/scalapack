@@ -37,7 +37,7 @@ NOOPT         = -O0
 
 FTFLAGS       = 
 
-FCFLAGS       = -cpp -DUSE_BLAS -DF2C -O3 -fopenmp
+FCFLAGS       = -cpp -DF2C -O3 -fopenmp
 
 # Retain the above line when linking with fortran to C converted  Lapack libraries.
 # Comment the above line and Uncomment the below line when linking with Fortran based Lapack libraries.

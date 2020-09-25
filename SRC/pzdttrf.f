@@ -750,7 +750,7 @@
 #ifdef F2C_COMPLEX
           CALL ZDOTC_F2C( TMP, ODD_SIZE, AF( 1 ), 1, AF( WORK_U+1 ), 1 )
           AF( ODD_SIZE+3 ) = -CONE * TMP
-#elif USE_BLAS
+#else
           AF( ODD_SIZE+3 ) = -CONE *
      $        ZDOTC( ODD_SIZE, AF( 1 ), 1, AF( WORK_U+1 ), 1 )
 #endif

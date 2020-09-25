@@ -664,7 +664,7 @@
 *                 XJ = CABS1( X( J ) )
 #ifdef F2C
                   CALL CLADIV( XJTMP, XJTMP, TJJS )
-#elif F90
+#else
                   XJTMP = CLADIV( XJTMP, TJJS )
 #endif
 
@@ -699,7 +699,7 @@
 *                 XJ = CABS1( X( J ) )
 #ifdef F2C
                     CALL CLADIV( XJTMP, XJTMP, TJJS )
-#elif F90
+#else
                     XJTMP = CLADIV( XJTMP, TJJS )
 #endif
                   XJ = CABS1( XJTMP )
@@ -832,7 +832,7 @@
 
 #ifdef F2C
                    CALL CLADIV( USCAL, USCAL, TJJS )
-#elif F90
+#else
                     USCAL = CLADIV( USCAL, TJJS )
 #endif
                   END IF
@@ -879,7 +879,7 @@
 
 #ifdef F2C
                    CALL CLADIV( ZDUM, ZDUM, USCAL )
-#elif F90
+#else
                     ZDUM = CLADIV( ZDUM, USCAL )
 #endif
                      CALL PCSCAL( J-1, ZDUM, A, IA, JA+J-1, DESCA, 1 )
@@ -894,7 +894,7 @@
      
 #ifdef F2C
                    CALL CLADIV( ZDUM, ZDUM, USCAL )
-#elif F90   
+#else   
                     ZDUM = CLADIV( ZDUM, USCAL )
 #endif
                      CALL PCSCAL( N-J, ZDUM, A, IA+J, JA+J-1, DESCA, 1 )
@@ -960,7 +960,7 @@
 *                    X( J ) = CLADIV( X( J ), TJJS )
 #ifdef F2C
                     CALL CLADIV( XJTMP, XJTMP, TJJS )
-#elif F90
+#else
                      XJTMP = CLADIV( XJTMP, TJJS )
 #endif
 
@@ -985,7 +985,7 @@
 *                    X( J ) = CLADIV( X( J ), TJJS )
 #ifdef F2C
                     CALL CLADIV( XJTMP, XJTMP, TJJS )
-#elif F90
+#else
                      XJTMP = CLADIV( XJTMP, TJJS )
 #endif
 
@@ -1018,7 +1018,7 @@
 #ifdef F2C
                   CALL CLADIV( CDIV_TMP1, XJTMP, TJJS )
                   XJTMP = CDIV_TMP1 - CSUMJ
-#elif F90
+#else
                   XJTMP = CLADIV( XJTMP, TJJS ) - CSUMJ
 #endif
 
@@ -1081,7 +1081,7 @@
                      REC = MIN( ONE, REC*TJJ )
 #ifdef F2C
                     CALL  CLADIV( USCAL, USCAL, TJJS )
-#elif F90
+#else
                      USCAL = CLADIV( USCAL, TJJS )
 #endif
 
@@ -1130,7 +1130,7 @@
      $                            X, IX, JX, DESCX, 1 )
 #ifdef F2C
                      CALL  CLADIV( ZDUM, CONE, ZDUM )
-#elif F90
+#else
                      ZDUM = CLADIV( CONE, ZDUM )
 #endif
                      CALL PCSCAL( J-1, ZDUM, A, IA, JA+J-1, DESCA, 1 )
@@ -1146,7 +1146,7 @@
 
 #ifdef F2C
                      CALL  CLADIV( ZDUM, CONE, ZDUM )
-#elif F90
+#else
                      ZDUM = CLADIV( CONE, ZDUM )
 #endif
 
@@ -1213,7 +1213,7 @@
 *                    X( J ) = CLADIV( X( J ), TJJS )
 #ifdef F2C
                     CALL CLADIV( XJTMP, XJTMP, TJJS )
-#elif F90
+#else
                      XJTMP = CLADIV( XJTMP, TJJS )
 #endif
 
@@ -1236,7 +1236,7 @@
 *                    X( J ) = CLADIV( X( J ), TJJS )
 #ifdef F2C
                      CALL  CLADIV( XJTMP, XJTMP, TJJS )
-#elif F90
+#else
                      XJTMP = CLADIV( XJTMP, TJJS )
 #endif
                      IF( ( MYROW.EQ.ITMP1X ) .AND. ( MYCOL.EQ.ITMP2X ) )
@@ -1265,7 +1265,7 @@
 #ifdef F2C
                   CALL CLADIV( CDIV_TMP1, XJTMP, TJJS )
                   XJTMP = CDIV_TMP1 - CSUMJ
-#elif F90
+#else
                   XJTMP = CLADIV( XJTMP, TJJS ) - CSUMJ
 #endif
 

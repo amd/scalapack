@@ -752,7 +752,7 @@
            CALL CDOTC_F2C( TMP, ODD_SIZE, AF( 1 ), 1, 
      $                     AF( WORK_U+1 ), 1 )
            AF( ODD_SIZE+3 ) = -CONE * TMP
-#elif USE_BLAS
+#else
           AF( ODD_SIZE+3 ) = -CONE *
      $        CDOTC( ODD_SIZE, AF( 1 ), 1, AF( WORK_U+1 ), 1 )
 #endif

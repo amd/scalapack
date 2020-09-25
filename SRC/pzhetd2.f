@@ -343,7 +343,7 @@
                      CALL ZDOTC_F2C( TMP, J, TAU( JJ ), 1,
      $                                         A( II+JK*LDA ), 1 )
                      ALPHA = -HALF*TAUI*TMP
-#elif USE_BLAS
+#else
                      ALPHA = -HALF*TAUI*ZDOTC( J, TAU( JJ ), 1,
      $                                         A( II+JK*LDA ), 1 )
 #endif
@@ -429,7 +429,7 @@
                      CALL ZDOTC_F2C( TMP, N-J, TAU( JK ), 1,
      $                        A( IK+1+(JK-1)*LDA ), 1 )
                      ALPHA = -HALF*TAUI*TMP
-#elif USE_BLAS
+#else
                      ALPHA = -HALF*TAUI*ZDOTC( N-J, TAU( JK ), 1,
      $                        A( IK+1+(JK-1)*LDA ), 1 )
 #endif

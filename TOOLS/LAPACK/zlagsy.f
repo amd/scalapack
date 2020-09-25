@@ -145,7 +145,7 @@
 #ifdef F2C_COMPLEX
          CALL ZDOTC_F2C( TMP, N-I+1, WORK, 1, WORK( N+1 ), 1 )
          ALPHA = -HALF*TAU*TMP
-#elif USE_BLAS
+#else
          ALPHA = -HALF*TAU*ZDOTC( N-I+1, WORK, 1, WORK( N+1 ), 1 )
 #endif
          CALL ZAXPY( N-I+1, ALPHA, WORK, 1, WORK( N+1 ), 1 )
@@ -202,7 +202,7 @@
 #ifdef F2C_COMPLEX
          CALL ZDOTC_F2C( TMP, N-K-I+1, A( K+I, I ), 1, WORK, 1 )
          ALPHA = -HALF*TAU*TMP
-#elif USE_BLAS
+#else
          ALPHA = -HALF*TAU*ZDOTC( N-K-I+1, A( K+I, I ), 1, WORK, 1 )
 #endif
          CALL ZAXPY( N-K-I+1, ALPHA, A( K+I, I ), 1, WORK, 1 )

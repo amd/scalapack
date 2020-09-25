@@ -131,15 +131,14 @@ MESSAGE(STATUS "=========")
 option(USE_F2C "Use FORTRAN To C compatible interface for certain Complex type functions" OFF)
 option(USE_DOTC_WRAPPER "Use wrapper for Complex DOTC function" OFF)
 
-set(f2cflag "-cpp -DF90 -DUSE_BLAS")
+set(f2cflag "-cpp ")
 
 if(USE_F2C)
-   if(USE_DOTC_WRAPPER)
-	set(f2cflag "-cpp -DF2C -DF2C_COMPLEX" )
-   else(USE_DOTC_WRAPPER)
-	   set(f2cflag "-cpp -DF2C -DUSE_BLAS" )
-   ENDIF(USE_DOTC_WRAPPER)
+  set(f2cflag "-cpp -DF2C -DENABLE_LOOK_AHEAD_FOR_LU" )
 ENDIF(USE_F2C)
+if(USE_DOTC_WRAPPER)
+  set(f2cflag "-cpp -DF2C -DF2C_COMPLEX -DENABLE_LOOK_AHEAD_FOR_LU" )
+ENDIF(USE_DOTC_WRAPPER)
 
 ADD_DEFINITIONS( "-D${CDEFS}" "${f2cflag}")
 

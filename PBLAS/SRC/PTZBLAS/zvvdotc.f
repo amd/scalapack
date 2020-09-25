@@ -69,7 +69,7 @@
 #ifdef F2C_COMPLEX
       CALL ZDOTC_F2C( TMP, N, X, INCX, Y, INCY )
       DOT = DOT + TMP
-#elif USE_BLAS
+#else
       DOT = DOT + ZDOTC( N, X, INCX, Y, INCY )
 #endif
 *

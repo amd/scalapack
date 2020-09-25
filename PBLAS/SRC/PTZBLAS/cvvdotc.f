@@ -67,7 +67,7 @@
 #ifdef F2C_COMPLEX
       CALL CDOTC_F2C( TMP, N, X, INCX, Y, INCY )
       DOT = DOT + TMP
-#elif USE_BLAS
+#else
       DOT = DOT + CDOTC( N, X, INCX, Y, INCY )
 #endif
 *

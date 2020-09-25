@@ -39,9 +39,10 @@ int AOCLI_IdringSR(BLACSCONTEXT *ctxt, AOCLPBUFF *pb, int step)
 
    MPI_Comm comm;
    int ierr, m_in, rval;
+   rval = AOCL_SUCCESS;
 
    Np = ctxt->scp->Np;
-   if (Np < 2) return;
+   if (Np < 2) return rval;
 
    Iam   = ctxt->scp->Iam;
    msgid = pb->msgid;
@@ -51,7 +52,6 @@ int AOCLI_IdringSR(BLACSCONTEXT *ctxt, AOCLPBUFF *pb, int step)
    next = (Np+Iam+step)%Np;
 
    comm = ctxt->scp->comm;
-   rval = AOCL_SUCCESS;
 
    if(Iam == root)
    {
